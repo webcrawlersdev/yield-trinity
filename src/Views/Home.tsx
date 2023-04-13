@@ -28,7 +28,7 @@ export default () => {
     const provider = useProvider()
     const { isConnected, address, } = useAccount()
     const { chain } = useNetwork()
-    const balance = useBalance()
+    const balance = useBalance({ address: address })
     const { innerWidth } = useWindowDimensions()
 
     const userData: IcontractRead = { functionName: 'owner', abi: SABI, address: ADDR['SHARED_WALLET'] }
@@ -44,8 +44,10 @@ export default () => {
         contracts: [
             { ...(userData as any) },
             { ...(userData as any), functionName: 'ownershipPercentage', args: [address] },
-            { ...(userData as any), functionName: 'availableForwithdrawal', args: [address] },
-            { ...(userData as any), functionName: 'balances', args: [address] }
+            { ...(userData as any), functionName: 'conspectus', args: [address] },
+            { ...(userData as any), functionName: 'contribute', args: [address] },
+            { ...(userData as any), functionName: 'withdrawalFee', args: [] },
+            { ...(userData as any), functionName: 'dilutedEarning', args: [address] },
         ]
         , watch: true,
         cacheTime: 0
@@ -88,19 +90,13 @@ export default () => {
                 {
                     isConnected ?
                         <Typography component={'p'} >
-                            Your current ownership stake in the  pool capitalization is <span className="green">%{u_loading ? 'loading' : precise((userDatas as any)?.[1])}</span>
+                            Your current ownership stake in the  pool capitalization is <span className="green">%{u_loading ? 'loading' : precise((userDatas as any)?.[1] ?? 0)}</span>
                         </Typography>
                         :
                         <Typography component={'p'} >
                             Wallet not <span className="orangered">Connected {isConnected && amount}</span>.
                         </Typography>
                 }
-                <hr />
-                <div className="chip-wrapper">
-                    <div className="tab-lets">
-
-                    </div>
-                </div>
             </Box>
         </Box>
     )
@@ -119,14 +115,13 @@ export default () => {
                 {
                     isConnected ?
                         <Typography component={'p'} >
-                            Your current ownership stake in the  pool capitalization is <span className="green">%{u_loading ? 'loading' : precise((userDatas as any)?.[1])}</span>.
+                            Your current ownership stake in the  pool capitalization is <span className="green">%{u_loading ? '---' : precise((userDatas as any)?.[1] ?? 0)}</span>.
                         </Typography>
                         :
                         <Typography component={'p'}  >
                             Wallet not <span className="orangered">Connected {isConnected && amount}</span>.
                         </Typography>
                 }
-
             </Box>
         </Box>
     )
@@ -150,7 +145,7 @@ export default () => {
                 <Box className="input-area">
                     <Box className="input-reactonly">
                         <Button className="primary-button" >
-                            <label htmlFor="amount" className="input-label">{chain?.nativeCurrency?.symbol}</label>
+                            <label htmlFor="amount" className="input-label">{chain?.nativeCurrency?.symbol ?? '- - -'}</label>
                         </Button>
                         <input type="number" id="amount" className="input-reading"
                             onChange={(i: any) => setamount(o => (i.target.valueAsNumber >= 0) ? i.target.value : o)}
@@ -159,34 +154,23 @@ export default () => {
                 </Box>
 
                 {tnxMode === 'deposit' ? NewTnxDeposit : NewTnxWithdraw}
-                <div className="chip-wrapper">
-                    {tnxMode === 'deposit' ? <div className="tab-lets">
-                        <Chip
-                            className="chip"
-                            label="Withdrawal fee 0.00%"
-                            onClick={() => { }}
-                            onDelete={() => { }}
-                            deleteIcon={<WalletIcon color='success' />}
-                        />
 
-                        <Chip
-                            className="chip"
-                            label={`Est. Transaction Fees ~$23`}
-                            onClick={() => { }}
-                            onDelete={() => { }}
-                            deleteIcon={<GasMeterIcon />}
-                        />
-                    </div>
-                        :
+                <Box className="input-area" style={{ marginBottom: '1rem', borderRadius: 50, overflow: 'hidden' }}>
+                    <div className="chip-wrapper">
                         <div className="tab-lets">
-                            <Chip
+                            {tnxMode != 'deposit' ? <Chip
+                                className="chip"
+                                label={`Withdrawal fee %${precise((userDatas as any)?.[4] / 100 ?? 0)}`}
+                                onClick={() => { }}
+                                onDelete={() => { }}
+                                deleteIcon={<WalletIcon color='success' />}
+                            /> : <Chip
                                 className="chip"
                                 label="Lockup Period ~ none"
                                 onClick={() => { }}
                                 onDelete={() => { }}
                                 deleteIcon={<DoneIcon />}
-                            />
-
+                            />}
                             <Chip
                                 className="chip"
                                 label={`Est. Gas Price ~GWEI/${gasPrice}`}
@@ -194,10 +178,8 @@ export default () => {
                                 onDelete={() => { }}
                                 deleteIcon={<GasMeterIcon />}
                             />
-                        </div>}
-                </div>
-                <Box className="input-area" style={{ marginBlock: '1rem', borderRadius: 50, overflow: 'hidden' }}>
-                    <LinearProgress variant="determinate"    />
+                        </div>
+                    </div>
                 </Box>
                 <Box className="input-area" >
                     {
@@ -209,7 +191,15 @@ export default () => {
                                 onClick={handleDepOrWith}>
                                 {tnxMode}{(tnx_loading || u_loading) && "ing..."}
                             </Button>
-                            : <Web3Button label="Connect wallet first." />
+                            : <div className="space-between">
+                                <Web3Button label="Connect wallet first." />
+                                <Button
+                                    className={`  ${tnxMode === 'withdraw' ? 'bg-red' : ''}`}
+                                    style={{ flexGrow: 1, borderRadius: 10, boxShadow: 'none' }} variant='contained'
+                                    onClick={handleDepOrWith}>
+                                    <a href="">Learn More</a>
+                                </Button>
+                            </div>
                     }
                 </Box>
             </Box>
@@ -240,7 +230,7 @@ export default () => {
                                 Credits
                             </Typography>
                             <Typography component='p'>
-                                {chain?.nativeCurrency?.name}{u_loading ? 'loading' : precise(fmWei((userDatas as any)?.[3]))}
+                                {chain?.nativeCurrency?.name}{u_loading ? '---' : precise(fmWei((userDatas as any)?.[3]))}
                             </Typography>
                         </div>
 
@@ -250,32 +240,33 @@ export default () => {
                             </Typography>
                             <Typography component='p'>
                                 <span className="orangered">
-                                    %{u_loading ? 'loading' : precise((userDatas as any)?.[1])}
+                                    %{u_loading ? '---' : precise((userDatas as any)?.[1] ?? 0)}
                                 </span>
                             </Typography>
                         </div>
                         <div className="stats-dash-flexed-box" data-name='-'>
                             <Typography className="balance-overview-text" component='h4'>
-
+                                Diluted earnings
                             </Typography>
                             <Typography component='p'>
-
+                                {chain?.nativeCurrency?.name} <span className="green">+{precise(fmWei((userDatas as any)?.[5] ?? 0))}</span>
                             </Typography>
                         </div>
-                        <div className="stats-dash-flexed-box" data-name='%'>
+                        {/* <div className="stats-dash-flexed-box" data-name='%'>
                             <Typography className="balance-overview-text" component='h4'>
                                 Historical Profits
                             </Typography>
                             <Typography component='p'>
-                                <span className="green">DATA COMING SOON</span>
+                                <span className="orangered">DATA COMING SOON</span>
                             </Typography>
-                        </div>
+                        </div> */}
 
                     </div>
                 </Box>
             </Box>
         </Box>
     )
+
 
     return (
         <Master>
@@ -284,7 +275,7 @@ export default () => {
                     Connect Your Wallet To View Stats
                 </Typography>
             }
-            <Grid className="dash">
+            <Grid className="dash" style={{ borderRadius: 20 }}>
                 {NewTnxGrid}
                 {/* <Box className="dash-main-box">  </Box> */}
                 {isConnected && UserStatsGrig}

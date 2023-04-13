@@ -15,15 +15,17 @@ export const SHARED_WALLET = [
     "function updateUserOwnershipPercentage(address user)",
 
     "function ownershipPercentage(address user) public view returns (uint256)",
-    "function availableForwithdrawal(address user) public view returns (uint256)",
-    "function balances(address user) public view returns (uint256)",
+    "function conspectus(address user) public view returns (uint256)",
+    "function contribute(address user) public view returns (uint256)",
     "function owner () public view returns (address)",
+    "function withdrawalFee () public view returns (uint256)",
+    "function dilutedEarning(address user) view returns (uint256)",
 
 
     "function getUserBorrowedAmount(address user) view returns (uint256)",
     "function getUserRepaidAmount(address user) view returns (uint256)",
     "function getUserPotentialEarn(address user) view returns (uint256)",
-    "function getUserDilutedEarning(address user) view returns (uint256)",
+
     "function getUserAvailableForWithdrawal(address user) view returns (uint256)",
     "function isWhitelistedUser(address user) view returns (bool)",
     "function whitelistUser(address user)",

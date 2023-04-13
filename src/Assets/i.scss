@@ -260,13 +260,20 @@ input[type=number] {
 }
 
 .chip-wrapper {
+    flex-wrap: wrap;
+    overflow: hidden;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    justify-content: center;
+    border-top: solid thin rgb(51, 51, 51);
+    
+    .tab-lets {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     border-radius: 10px;
-    overflow: hidden;
-    background: whitesmoke;
+    }
+
 
     .chip {
         padding: 0 !important;
@@ -274,6 +281,8 @@ input[type=number] {
         font-size: 12px;
         background: transparent !important;
         position: relative;
+        color: aliceblue;
+        text-align: center;
     }
 }
 
@@ -379,32 +388,47 @@ input[type=number] {
 }
 
 
+.snipper-up-time-contain{
+    width: 100%;
+    background: #101213 !important;
+    padding: 1.3rem;
+    margin-bottom: 1rem;
+    display: flex;
+}
+
 @media (max-width:600px) {
     .main-container {
         padding: 0;
+        width: 100dvw
     }
 
     .heading-main {
         padding: 1rem;
         background: black;
-        border-radius: 0;
+        width: 92%;
+        margin: 4%;
+        box-shadow: 0 0 10px rgb(3, 34, 44);
     }
 
     .dash {
-        background: black;
-        width: 100%;
+        background: rgb(0, 0, 0);
+        width: 95%;
         align-items: flex-start;
         border-top-left-radius: 20px;
         gap: 0;
-        margin: 0;
         border-top-right-radius: 20px;
-        box-shadow: 0 0 20px rgb(0, 0, 0);
+        box-shadow: 0 0 10px rgb(3, 34, 44);
+        margin-inline: auto;
+        margin-bottom: 2rem !important;
     }
+
 
     .dash-lin-box {
         width: 100%;
-        background: var(--body-background-color);
+        // background: var(--body-background-color);
         border-radius: 20px;
+        overflow: hidden;
+
     }
 
     .stats-dash-row {
@@ -425,9 +449,7 @@ input[type=number] {
     }
 
     .alone-contianer {
-
-        background: black;
-        // box-shadow: 0 0 1px white inset;
+        box-shadow: 0 0 10px rgb(13, 13, 13) inset;
         padding: 1rem;
 
         p {
