@@ -1,12 +1,11 @@
-import { Box, Button, ButtonGroup, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import DropDown from '../../Components/Dropdown'
-import { Web3Button } from '@web3modal/react'
+import { Web3Button, Web3NetworkSwitch } from '@web3modal/react'
 import { useNetwork } from 'wagmi'
 import useWindowDimensions from '../../Hooks/useWindowDimensions'
-import { MenuToggle } from '../Drawer/index'
 
 
-export default function Heading({ handlemenuTooggle, isMenuOpen }: { handlemenuTooggle: Function, isMenuOpen:boolean }) {
+export default function Heading({ handlemenuTooggle, isMenuOpen }: { handlemenuTooggle: Function, isMenuOpen: boolean }) {
 
     const network = useNetwork()
     const { innerWidth } = useWindowDimensions()
@@ -22,14 +21,12 @@ export default function Heading({ handlemenuTooggle, isMenuOpen }: { handlemenuT
                     {
                         innerWidth < 600 ? '' :
                             <DropDown title={network.chain?.name}>
-                                {/* <div className="space-between">
-                            {network?.chains?.map(chain => <Button variant='contained' className='drop-down-btn margin-bottom-sp'>{chain.nativeCurrency.symbol}</Button>)}
-                        </div> */}
+                                {/* {network?.chain?.nativeCurrency?} */}
+                                <Web3NetworkSwitch />
                             </DropDown>
                     }
-
                 </Box>
-                <Web3Button balance="show"  />
+                <Web3Button balance="show" />
             </Box>
         </Box>
     )
