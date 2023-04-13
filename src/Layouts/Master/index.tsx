@@ -7,7 +7,7 @@ export default ({ children }: { children: React.ReactNode }) => {
     const toggleMenu = () => setisMenuOpen(o => !o)
     return (
         <Box sx={{ display: 'flex' }}>
-            <MiniDrawer open={isMenuOpen} />
+            {/* <MiniDrawer open={isMenuOpen} /> */}
             <Box component="main" className="main-container" sx={{  }}>
                 <Heading isMenuOpen={isMenuOpen} handlemenuTooggle={toggleMenu} />
                 {children}

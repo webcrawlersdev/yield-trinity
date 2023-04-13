@@ -17,6 +17,9 @@ export default function Heading({ handlemenuTooggle, isMenuOpen }: { handlemenuT
                     <Typography component={'h1'}>
                         <a href={window.location.href}>{window.location.pathname == '/' ? 'Yield Trinity' : window.location.pathname.replace('/', '')}</a>
                     </Typography>
+                    <Typography component={'h1'}>
+                        <a href='#doc-coming-soon'>DOC</a>
+                    </Typography>
                     {/* <MenuToggle isOpen={isMenuOpen} handlemenuTooggle={handlemenuTooggle} />  */}
                     {
                         innerWidth < 600 ? '' :
