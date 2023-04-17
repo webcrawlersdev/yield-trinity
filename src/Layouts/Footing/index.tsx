@@ -12,10 +12,12 @@ export default function Footing() {
         <Box className='footing-main' style={{ position: 'sticky', top: 0 }}>
             <Box className="space-between">
                 <div className="space-between">
-                    <Button>support</Button>
+                    <Button >
+                        <a target='_' href="https://t.me/yieldTrinity">support</a>
+                    </Button>
                 </div>
-                <small className="orangered small-text">
-                    &copy; YieldTrinity {String( new Date().getFullYear())}
+                <small className=" small-text">
+                    &copy; YieldTrinity {String(new Date().getFullYear())}
                 </small>
             </Box>
         </Box>

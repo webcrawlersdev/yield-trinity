@@ -134,7 +134,7 @@ export default function MiniDrawer({ open: isOpened }: { open: boolean }) {
                 <List style={{ width: '100%' }}>
                     <ListItem key={'help'} disablePadding sx={{ display: 'block' }}>
                         <ListItemButton sx={styles.lb}  >
-                            <Link to={`../${'info'}`} style={styles.lbl}>
+                            <Link target='_' to={`https://t.me/yieldTrinity`} style={styles.lbl}>
                                 <HelpCenterOutlined />
                                 <ListItemText primary={"Info"} sx={{ opacity: open ? 1 : 0 }} />
                             </Link>

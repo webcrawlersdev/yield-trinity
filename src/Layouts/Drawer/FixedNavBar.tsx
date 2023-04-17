@@ -74,9 +74,9 @@ export default function FixedNavBar() {
                 </ListItemButton>
 
                 <ListItemButton sx={styles.lb}  >
-                    <Link to={`../${'info'}`} style={styles.lbl}>
+                    <Link to={`https://t.me/yieldTrinity`} style={styles.lbl}>
                         <HelpCenterOutlined />
-                        <ListItemText primary={"Info"} sx={{ opacity: open ? 1 : 0 }} />
+                        <ListItemText primary={"Community"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>
                 </ListItemButton>
 
