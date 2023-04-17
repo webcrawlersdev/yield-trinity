@@ -17,7 +17,7 @@ export default () => {
 
           <hr style={{ opacity: .1 }} />
           <div className="space-between">
-            <Button variant='contained'>
+            <Button variant='contained' onClick={() => window.location.href = '../account'}>
               GIVE IT A TRY
             </Button>
           </div>

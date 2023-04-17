@@ -167,12 +167,12 @@ export default () => {
                         }
 
                         <div className="space-between">
-                            <Link to={`../swap?pair=${lastPair}`}>
+                            <Link to={`../recto?page=swap&&pair=${lastPair}`}>
                                 <Button className=" primary-button">
                                     Early Access
                                 </Button>
                             </Link>
-                            <a href={`../explorer?explore=new-pairs`}
+                            <a href={`../recto?page=pairs`}
                                 className="space-between">
                                 <Button className=" primary-button">
                                     New Pairs<ArrowRight />

@@ -17,13 +17,15 @@ export default function FixedNavBar() {
     const mmenu = useRef<any>(<div></div>)
 
     useEffect(() => {
-        window.document.addEventListener('mouseup', (e: any) => {
-            const menu = e.target
-            if (menu !== mmenu?.current && !(mmenu?.current?.contains(menu).lenght)) {
-                setIsOpen(o => false)
-            }
-        })
-        return () => window.document.removeEventListener('mouseup', (e: any) => { })
+        if (!(innerWidth > 600)) {
+            window.document.addEventListener('mouseup', (e: any) => {
+                const menu = e.target
+                if (menu !== mmenu?.current && !(mmenu?.current?.contains(menu).lenght)) {
+                    setIsOpen(o => false)
+                }
+            })
+            return () => window.document.removeEventListener('mouseup', (e: any) => { })
+        }
     }, [])
 
 
@@ -65,9 +67,9 @@ export default function FixedNavBar() {
                     </Link>
                 </ListItemButton>
                 <ListItemButton sx={styles.lb}  >
-                    <Link to={`../${'explorer'}`} style={styles.lbl}>
+                    <Link to={`../${'recto?page=pairs'}`} style={styles.lbl}>
                         <ExploreOutlined />
-                        <ListItemText primary={"Explorer | New pairs"} sx={{ opacity: open ? 1 : 0 }} />
+                        <ListItemText primary={"Explore"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>
                 </ListItemButton>
 

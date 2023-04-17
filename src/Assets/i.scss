@@ -182,13 +182,30 @@ img {
     }
 }
 
+.img-code {
+    width: 100%;
+    display: flex;
+    pointer-events: none !important;
+    mix-blend-mode: screen;
+
+    .code-intereact {
+        width: 100%;
+        transform: rotate(360deg);
+        transition: transform 600ms;
+        scale: 1.2;
+        mix-blend-mode: multiply;
+        filter: contrast(1.5);
+        z-index: -1;
+    }
+}
+
 .drawer-main {
     height: clamp(100dvh, 100dvh, 100dvh);
 }
 
 .heading-main {
     background: var(--box-background-color);
-    z-index: 10;
+    z-index: 20;
     padding: .5rem;
     padding-inline: 1rem;
     top: 1rem;

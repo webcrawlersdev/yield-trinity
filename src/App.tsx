@@ -1,12 +1,12 @@
 import useAssets from './Assets';
 import Web3Modal from './Ethereum/Web3Modal';
-import { BrowserRouter as BR, Routes, Route, redirect } from 'react-router-dom'
+import { BrowserRouter as BR, Routes, Route } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import E404Page from './Views/E404Page';
 import Home from './Views/Home';
 import Dashboard from './Views/Dashoard';
-import Explorer from './Views/Explorer';
+import Page from './Views/Pages';
 import Info from './Views/Info';
 
 
@@ -20,7 +20,7 @@ function App() {
           <Route path='' element={<Home />} />
           <Route path='account' element={<Home />} />
           <Route path='dashboard' element={<Dashboard />} />
-          <Route path='explorer' element={<Explorer />} />
+          <Route path='recto' element={<Page />} />
           <Route path='info' element={<Info />} />
           <Route path='*' element={<E404Page />} />
         </Routes>

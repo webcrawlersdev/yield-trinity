@@ -1,17 +1,23 @@
-import { Box, Button,  Typography, Chip, Tooltip, Grid,   Switch } from "@mui/material"
+import { Box, Button, Typography, Chip, Tooltip, Grid } from "@mui/material"
 import Master from "../Layouts/Master"
 import { useState, useEffect } from 'react'
 import DoneIcon from '@mui/icons-material/DoneAllOutlined'
 import GasMeterIcon from '@mui/icons-material/GasMeterOutlined'
 import WalletIcon from '@mui/icons-material/WalletOutlined'
 import InfoIcon from '@mui/icons-material/InfoOutlined'
-import { useAccount, useNetwork, useContractWrite, useContractReads,  useBalance, useProvider } from 'wagmi'
-import { Web3Button } from '@web3modal/react' 
+import { useAccount, useNetwork, useContractWrite, useContractReads, useBalance, useProvider } from 'wagmi'
+import { Web3Button } from '@web3modal/react'
 import CancelIcon from '@mui/icons-material/CancelOutlined'
 import { useADDR } from "../Ethereum/Addresses"
 import { SHARED_WALLET as SABI } from "../Ethereum/ABIs/SharedWallet"
 import { fmWei, precise, toWei } from '../Helpers'
 import { toast } from 'react-toastify'
+import useAssets from "../Assets"
+import useWindowDimensions from "../Hooks/useWindowDimensions"
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { Timelapse } from "@mui/icons-material"
+dayjs.extend(relativeTime)
 
 interface IcontractRead {
     functionName: string,
@@ -24,23 +30,15 @@ export default () => {
     const [amount, setamount] = useState(0.5)
     const [tnxMode, settnxMode] = useState<'deposit' | 'withdraw'>('deposit')
     const [gasPrice, setGasPrice] = useState('0.00')
+    const { innerWidth } = useWindowDimensions()
     const provider = useProvider()
     const { isConnected, address, } = useAccount()
     const { chain } = useNetwork()
     const balance = useBalance({ address: address })
     const ADDR = useADDR(chain?.id)
+    const assets = useAssets('images')
 
     const userData: IcontractRead = { functionName: 'owner', abi: SABI, address: ADDR['SHARED_WALLET'] }
-
-    const { data, isLoading: tnx_loading, isSuccess, error, isError, write } = useContractWrite({
-        mode: 'recklesslyUnprepared',
-        address: ADDR['SHARED_WALLET'] as any, abi: SABI, functionName: tnxMode,
-        overrides: tnxMode === 'deposit' ? { value: toWei(amount) } : {},
-        args: tnxMode === 'withdraw' ? [toWei(amount)] : undefined
-    })
-
- 
-
     const { data: userDatas, isLoading: u_loading } = useContractReads({
         contracts: [
             { ...(userData as any) },
@@ -49,9 +47,21 @@ export default () => {
             { ...(userData as any), functionName: 'contribute', args: [address] },
             { ...(userData as any), functionName: 'withdrawalFee', args: [] },
             { ...(userData as any), functionName: 'dilutedEarning', args: [address] },
+            { ...(userData as any), functionName: 'minLockPeriod', },
+            { ...(userData as any), functionName: 'lockMyFunds', args: [address] },
+            { ...(userData as any), functionName: 'potentialEarn', args: [address] },
         ]
         , watch: true,
         cacheTime: 1000
+    })
+
+    const [lockPeriod, setLockPeriod] = useState(Number(Number(((userDatas as any)?.[6]) / 3600).toFixed(2)))
+
+    const { data, isLoading: tnx_loading, isSuccess, error, isError, write } = useContractWrite({
+        mode: 'recklesslyUnprepared',
+        address: ADDR['SHARED_WALLET'] as any, abi: SABI, functionName: tnxMode,
+        overrides: tnxMode === 'deposit' ? { value: toWei(amount) } : {},
+        args: tnxMode === 'withdraw' ? [toWei(amount)] : [(lockPeriod * 3600).toFixed()]
     })
 
     useEffect(() => {
@@ -69,9 +79,21 @@ export default () => {
         }
     }, [data, error, userDatas])
 
+    useEffect(() => {
+
+    }, [])
+
 
     async function handleDepOrWith() {
-        // sharedWalletContract.call({from:address, value:})
+        if (tnxMode === 'deposit')
+            if (lockPeriod < (userDatas as any)?.[6] / 3600)
+                return toast.error(`Min lock periond is ${(userDatas as any)?.[6] / 3600}`)
+        if (tnxMode === 'withdraw') {
+            if (Number(String((userDatas as any)?.[8])) > 0) {
+                const confirmed = window.confirm(`Hey, you may lose ${(userDatas as any)?.[8]}% if withdraw now\n\Our trading bots are currently in position with your fund, if you withdraw now, you will lose your share of the current position.. nope no loss for you`)
+                if (!confirmed) return
+            }
+        }
         if (amount < 0.05)
             return toast.warn(`${chain?.nativeCurrency?.symbol} amount must be atleast 0.05`)
         write?.()
@@ -168,11 +190,10 @@ export default () => {
                                 </div>
                                 <hr />
                                 <div className="space-between">
-                                    <Switch />
                                     <input type="number" className="input-reading"
-                                        onChange={(i: any) => setamount(o => (i.target.valueAsNumber >= 0) ? i.target.value : o)}
-                                        value={amount} placeholder={String(amount)} />
-                                    <Button children='days' />
+                                        onChange={(i: any) => setLockPeriod(o => (i.target.valueAsNumber >= 0) ? i.target.value : o)}
+                                        value={lockPeriod} placeholder={String((userDatas as any)?.[6] / 3600 + 'mins')} />
+                                    <Button children='hours' />
                                 </div>
                             </Box>
                             :
@@ -184,7 +205,16 @@ export default () => {
                                     <InfoIcon />
                                 </div>
                                 <hr />
-                                <h1 className="path-name" >Till  00:00:00</h1>
+                                <div className="space-between">
+                                    <strong className="path-name" >
+                                        {
+                                            Number(String((userDatas as any)?.[8])) > 0 ? "YOUR POTENTIAL LOSS"
+                                                : (userDatas as any)?.[7] * 1000 < Date.now() ? "Withdraw Funds"
+                                                    : dayjs(Date.now()).to((userDatas as any)?.[7] * 1000)
+                                        }
+                                    </strong>
+                                    <Timelapse />
+                                </div>
                             </Box>
                     }
                 </Box>
@@ -200,14 +230,14 @@ export default () => {
                                 deleteIcon={<WalletIcon color='success' />}
                             /> : <Chip
                                 className="chip"
-                                label="Lockup Period ~ none"
+                                label={`Lockup Period ~ ${((userDatas as any)?.[6] / 3600).toFixed(2)} Hours`}
                                 onClick={() => { }}
                                 onDelete={() => { }}
                                 deleteIcon={<DoneIcon />}
                             />}
                             <Chip
                                 className="chip"
-                                label={`Est. Gas Price ~GWEI/${gasPrice}`}
+                                label={`Est. Gas Price ~ Gwei/${gasPrice}`}
                                 onClick={() => { }}
                                 onDelete={() => { }}
                                 deleteIcon={<GasMeterIcon />}
@@ -312,8 +342,17 @@ export default () => {
             }
             <Grid className="dash" style={{ borderRadius: 20 }}>
                 {NewTnxGrid}
+                {
+                    innerWidth > 600 && <Box className="dash-main-box" >
+                        <div className="img-code">
+                            <img src={(assets as any)?.[tnxMode === 'deposit' ? 'deposit_code' : 'withdraw_code']} alt="" className="code-intereact" />
+                        </div>
+                        <div className="img-code">
+                            <img src={(assets as any)?.sync_code} alt="" className="code-intereact" />
+                        </div>
+                    </Box>
+                }
                 {isConnected && UserStatsGrig}
-                <Box className="dash-main-box"> </Box>
             </Grid>
         </Master>
     )

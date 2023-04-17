@@ -123,7 +123,7 @@ export default function MiniDrawer({ open: isOpened }: { open: boolean }) {
                     </ListItem>
                     <ListItem key={'explorer'} disablePadding sx={{ display: 'block' }}>
                         <ListItemButton sx={styles.lb}  >
-                            <Link to={`../${'explorer'}`} style={styles.lbl}>
+                            <Link to={`../${'recto?page=pairs'}`} style={styles.lbl}>
                                 <ExploreOutlined />
                                 <ListItemText primary={"Explorer | New pairs"} sx={{ opacity: open ? 1 : 0 }} />
                             </Link>
