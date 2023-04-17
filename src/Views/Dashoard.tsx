@@ -157,7 +157,7 @@ export default () => {
                                 </div>
                             </>
                                 : <div className="top-level-three all-center">
-                                    NO LIQUIDIDTY YET FOR THE {chain?.nativeCurrency?.symbol}/{(tokenInfo as any)?.[2] ?? "NEW"} PAIR
+                                    No liquidity yet for {chain?.nativeCurrency?.symbol}/{(tokenInfo as any)?.[2] ?? "- - -"}
                                     <Divider />
                                     <Box sx={{ width: '100%', marginBlock: '.7rem', borderRadius: 50, overflow: 'hidden' }}>
                                         <LinearProgress />
