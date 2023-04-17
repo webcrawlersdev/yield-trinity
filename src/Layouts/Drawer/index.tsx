@@ -5,13 +5,19 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import HelpCenterOutlined from '@mui/icons-material/HelpCenterOutlined'
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard'
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
+import { Box } from '@mui/material'
+
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import useWindowDimensions from '../../Hooks/useWindowDimensions';
+import { ExploreOutlined } from '@mui/icons-material';
 const drawerWidth = 200;
 
 export const openedMixin = (theme: Theme): CSSObject => ({
@@ -69,54 +75,84 @@ export default function MiniDrawer({ open: isOpened }: { open: boolean }) {
 
     useEffect(() => {
         setIsOpen(o => isOpened)
-
         return () => { }
     }, [isOpened])
 
 
+    const styles = {
+        lb: {
+            minHeight: 48,
+            justifyContent: open ? 'initial' : 'center',
+            px: 2.5,
+        },
+        lbl: {
+            minWidth: 0,
+            width: open ? 3 : 'auto',
+            justifyContent: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '.6rem',
+            paddingInline: '.6rem'
+        }
+    }
+
+
     return (
-        <div style={{
-            width: innerWidth < 600 && open ? '70dvw' : 60,
-            overflow: 'hidden',
-            display: innerWidth < 600 && !open ? 'none' : 'flex',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            zIndex: 20,
-            background: 'red',
-        }}>
-            {/* <CssBaseline /> */}
-            <Drawer variant="permanent" open={open}  >
-                <MenuToggle isOpen={open} handlemenuTooggle={() => setIsOpen(s => !s)} />
-                <Divider />
-                <List>
-                    {['Dashboard'].map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                            <ListItemButton
-                                sx={{
-                                    minHeight: 48,
-                                    justifyContent: open ? 'initial' : 'center',
-                                    px: 2.5,
-                                }}
-                            >
-                                <Link to={`${window.location.protocol}/${text}`} style={{
-                                    minWidth: 0,
-                                    width: open ? 3 : 'auto',
-                                    justifyContent: 'center',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '.6rem',
-                                    paddingInline: '.6rem'
-                                }} >
-                                    {text === 'Dashboard' && <DashboardIcon />}
-                                    {open && <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />}
-                                </Link>
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
+        <Drawer variant="permanent" open={open} className='drawer-main' >
+            <MenuToggle isOpen={open} handlemenuTooggle={() => setIsOpen(s => !s)} />
+            <Divider />
+            {/* <div className="space-between" > */}
+            <Box sx={{ flexWrap: 'wrap', display: 'flex', alignContent: 'space-between', height: '100%' }}>
+                <List style={{ width: '100%' }}>
+                    <ListItem key={'dashboard'} disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton sx={styles.lb}  >
+                            <Link to={`../${'dashboard'}`} style={styles.lbl}>
+                                <DashboardIcon />
+                                <ListItemText primary={"Dashboard"} sx={{ opacity: open ? 1 : 0 }} />
+                            </Link>
+                        </ListItemButton>
+                    </ListItem>
+
+                    <ListItem key={'account'} disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton sx={styles.lb}  >
+                            <Link to={`../${'account'}`} style={styles.lbl}>
+                                <AccountBalanceIcon />
+                                <ListItemText primary={"Account info"} sx={{ opacity: open ? 1 : 0 }} />
+                            </Link>
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem key={'explorer'} disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton sx={styles.lb}  >
+                            <Link to={`../${'explorer'}`} style={styles.lbl}>
+                                <ExploreOutlined />
+                                <ListItemText primary={"Explorer | New pairs"} sx={{ opacity: open ? 1 : 0 }} />
+                            </Link>
+                        </ListItemButton>
+                    </ListItem>
                 </List>
-                <Divider />
-            </Drawer>
-        </div>
+
+                <List style={{ width: '100%' }}>
+                    <ListItem key={'help'} disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton sx={styles.lb}  >
+                            <Link to={`../${'info'}`} style={styles.lbl}>
+                                <HelpCenterOutlined />
+                                <ListItemText primary={"Info"} sx={{ opacity: open ? 1 : 0 }} />
+                            </Link>
+                        </ListItemButton>
+                    </ListItem>
+
+                    <ListItem key={'info'} disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton sx={styles.lb}  >
+                            <Link to={`../${'info'}`} style={styles.lbl}>
+                                <InfoOutlinedIcon />
+                                <ListItemText primary={"App info"} sx={{ opacity: open ? 1 : 0 }} />
+                            </Link>
+                        </ListItemButton>
+                    </ListItem>
+                </List>
+            </Box>
+            {/* </div> */}
+            <Divider />
+        </Drawer>
     );
 }

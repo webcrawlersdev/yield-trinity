@@ -16,6 +16,7 @@
     "@types/react-dom": "^18.0.11",
     "@web3modal/ethereum": "^2.2.2",
     "@web3modal/react": "^2.2.2",
+    "dayjs": "^1.11.7",
     "ethers": "^5.7.2",
     "framer-motion": "^10.11.2",
     "react": "^18.2.0",

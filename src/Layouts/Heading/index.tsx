@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material'
+import InfoIcon from '@mui/icons-material/InfoOutlined'
 import DropDown from '../../Components/Dropdown'
 import { Web3Button, Web3NetworkSwitch } from '@web3modal/react'
 import { useNetwork } from 'wagmi'
@@ -13,13 +14,10 @@ export default function Heading({ handlemenuTooggle, isMenuOpen }: { handlemenuT
     return (
         <Box className='heading-main' style={{ position: 'sticky', top: 0 }}>
             <Box className="space-between">
-                <Box className="space-between">
-                    <Typography component={'h1'}>
-                        <a href={window.location.href}>{window.location.pathname == '/' ? 'Yield Trinity' : window.location.pathname.replace('/', '')}</a>
-                    </Typography>
-                    <Typography component={'h1'}>
-                        <a href='#doc-coming-soon'>DOC</a>
-                    </Typography>
+                <div className="space-between">
+                        <Typography component={'h1'}>
+                            <a className='site-name' href={window.location.href}>{"YieldTrinity"}</a>
+                        </Typography>
                     {/* <MenuToggle isOpen={isMenuOpen} handlemenuTooggle={handlemenuTooggle} />  */}
                     {
                         innerWidth < 600 ? '' :
@@ -28,7 +26,7 @@ export default function Heading({ handlemenuTooggle, isMenuOpen }: { handlemenuT
                                 <Web3NetworkSwitch />
                             </DropDown>
                     }
-                </Box>
+                </div>
                 <Web3Button balance="show" />
             </Box>
         </Box>

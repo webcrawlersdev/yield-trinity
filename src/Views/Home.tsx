@@ -1,15 +1,14 @@
-import { Box, Button, LinearProgress, Typography, Chip, Tooltip, Grid, Skeleton } from "@mui/material"
+import { Box, Button,  Typography, Chip, Tooltip, Grid,   Switch } from "@mui/material"
 import Master from "../Layouts/Master"
 import { useState, useEffect } from 'react'
 import DoneIcon from '@mui/icons-material/DoneAllOutlined'
 import GasMeterIcon from '@mui/icons-material/GasMeterOutlined'
 import WalletIcon from '@mui/icons-material/WalletOutlined'
 import InfoIcon from '@mui/icons-material/InfoOutlined'
-import { useAccount, useNetwork, useContractWrite, useContractReads, useBalance, useProvider } from 'wagmi'
-import { Web3Button } from '@web3modal/react'
-import useWindowDimensions from "../Hooks/useWindowDimensions"
+import { useAccount, useNetwork, useContractWrite, useContractReads,  useBalance, useProvider } from 'wagmi'
+import { Web3Button } from '@web3modal/react' 
 import CancelIcon from '@mui/icons-material/CancelOutlined'
-import { ADDR } from "../Ethereum/Addresses"
+import { useADDR } from "../Ethereum/Addresses"
 import { SHARED_WALLET as SABI } from "../Ethereum/ABIs/SharedWallet"
 import { fmWei, precise, toWei } from '../Helpers'
 import { toast } from 'react-toastify'
@@ -29,7 +28,7 @@ export default () => {
     const { isConnected, address, } = useAccount()
     const { chain } = useNetwork()
     const balance = useBalance({ address: address })
-    const { innerWidth } = useWindowDimensions()
+    const ADDR = useADDR(chain?.id)
 
     const userData: IcontractRead = { functionName: 'owner', abi: SABI, address: ADDR['SHARED_WALLET'] }
 
@@ -39,6 +38,8 @@ export default () => {
         overrides: tnxMode === 'deposit' ? { value: toWei(amount) } : {},
         args: tnxMode === 'withdraw' ? [toWei(amount)] : undefined
     })
+
+ 
 
     const { data: userDatas, isLoading: u_loading } = useContractReads({
         contracts: [
@@ -50,7 +51,7 @@ export default () => {
             { ...(userData as any), functionName: 'dilutedEarning', args: [address] },
         ]
         , watch: true,
-        cacheTime: 0
+        cacheTime: 1000
     })
 
     useEffect(() => {
@@ -155,6 +156,39 @@ export default () => {
 
                 {tnxMode === 'deposit' ? NewTnxDeposit : NewTnxWithdraw}
 
+                <Box className="input-area">
+                    {
+                        tnxMode === 'deposit' ?
+                            <Box className="alone-contianer">
+                                <div className="space-between">
+                                    <Typography component={'p'} >
+                                        Lockable Deposit
+                                    </Typography>
+                                    <InfoIcon />
+                                </div>
+                                <hr />
+                                <div className="space-between">
+                                    <Switch />
+                                    <input type="number" className="input-reading"
+                                        onChange={(i: any) => setamount(o => (i.target.valueAsNumber >= 0) ? i.target.value : o)}
+                                        value={amount} placeholder={String(amount)} />
+                                    <Button children='days' />
+                                </div>
+                            </Box>
+                            :
+                            <Box className="alone-contianer">
+                                <div className="space-between">
+                                    <Typography component={'p'} >
+                                        You Have Locked Deposit
+                                    </Typography>
+                                    <InfoIcon />
+                                </div>
+                                <hr />
+                                <h1 className="path-name" >Till  00:00:00</h1>
+                            </Box>
+                    }
+                </Box>
+
                 <Box className="input-area" style={{ marginBottom: '1rem', borderRadius: 50, overflow: 'hidden' }}>
                     <div className="chip-wrapper">
                         <div className="tab-lets">
@@ -181,6 +215,7 @@ export default () => {
                         </div>
                     </div>
                 </Box>
+
                 <Box className="input-area" >
                     {
                         isConnected ?
@@ -277,8 +312,8 @@ export default () => {
             }
             <Grid className="dash" style={{ borderRadius: 20 }}>
                 {NewTnxGrid}
-                {/* <Box className="dash-main-box">  </Box> */}
                 {isConnected && UserStatsGrig}
+                <Box className="dash-main-box"> </Box>
             </Grid>
         </Master>
     )

@@ -15,4 +15,9 @@ export const fmWei = (val: string | number, decimals: undefined | string | numbe
 export const toWei = (val: string | number, decimals: undefined | number = 18): ethers.BigNumber => {
     const vals = ethers.utils.parseUnits(String(val), decimals)
     return vals
-} 
+}
+
+export const fmtNumCompact = (val: number | string): string => {
+    const formatter = Intl.NumberFormat("en", { notation: "compact" });
+    return formatter.format(Number(val));
+}
