@@ -9,13 +9,13 @@ export default function Footing() {
     const { innerWidth } = useWindowDimensions()
 
     return (
-        <Box className='footing-main' style={{ position: 'sticky', top: 0 }}>
+        <Box className='footing-main'>
             <Box className="space-between">
-                <div className="space-between">
+                {/* <div className="space-between">
                     <Button >
                         <a target='_' href="https://t.me/yieldTrinity">support</a>
                     </Button>
-                </div>
+                </div> */}
                 <small className=" small-text">
                     &copy; YieldTrinity {String(new Date().getFullYear())}
                 </small>

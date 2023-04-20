@@ -1,19 +1,37 @@
-import { ArrowRight, SwapHorizRounded } from '@mui/icons-material'
-import { Box, Button } from '@mui/material/'
+import { ArrowDownward, ArrowDropDown, ArrowRight, SwapHorizRounded } from '@mui/icons-material'
+import { Box, Button, Divider } from '@mui/material/'
 import { useNetwork } from 'wagmi'
 import useWindowDimensions from '../../Hooks/useWindowDimensions'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useADDR } from '../../Ethereum/Addresses'
 
 export default () => {
 
     const { chain } = useNetwork()
     const { innerWidth } = useWindowDimensions()
-
+    const [q, setSearchParams] = useSearchParams({ dex: 'uniswap' });
+    const ADDR = useADDR(chain?.id)
+    const dex = (ADDR?.DEXS as any)?.[(q.get('dex') as any).toUpperCase().replace(/[^a-zA-Z]+/g, '')]
+    console.log(dex, (q.get('dex') as any).toUpperCase().replace(/[^a-zA-Z]+/g, ''))
     return (
-        <Box className="dash-main-box flexed-dash box-stats" >
+        <Box sx={{ width: '100%' }} >
+            <div className="page-navigator">
+                <div className="space-between">
+                    <Button variant='contained' style={{ padding: '.2rem' }} className={`primary-button dark-button ${!dex?.NAME && 'error'}`}>
+                        <img src={dex?.ICON} alt={dex?.SYMBOL} className="icon" />&nbsp;{dex?.NAME ?? `Invalid DEX`}&nbsp;<ArrowDropDown />
+                    </Button>
+                </div>
+                <div className="filter-input-wrapper">
+                    <input className="input-reading"
+                        onChange={() => { }}
+                        placeholder='Filter by symbol, name, pair address...' />
+                </div>
+            </div>
+
             <div className="list-wrap">
                 <ul className="ul list-ul">
                     <li className="list-li list-heading">
-                        <p className='centered-text'>New listings on {chain?.name} exchanges</p>
+
                     </li>
 
                     {

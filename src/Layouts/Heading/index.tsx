@@ -6,7 +6,7 @@ import { useNetwork } from 'wagmi'
 import useWindowDimensions from '../../Hooks/useWindowDimensions'
 
 
-export default function Heading({ handlemenuTooggle, isMenuOpen }: { handlemenuTooggle: Function, isMenuOpen: boolean }) {
+export default function Heading() {
 
     const network = useNetwork()
     const { innerWidth } = useWindowDimensions()
@@ -15,19 +15,23 @@ export default function Heading({ handlemenuTooggle, isMenuOpen }: { handlemenuT
         <Box className='heading-main' style={{ position: 'sticky', top: 0 }}>
             <Box className="space-between">
                 <div className="space-between">
-                        <Typography component={'h1'}>
-                            <a className='site-name' href={window.location.href}>{"YieldTrinity"}</a>
-                        </Typography>
+                    <Typography component={'h1'}>
+                        <a className='site-name' href={window.location.href}>{innerWidth < 700 ? "YT" : window.location.pathname.replace('/', '').replace('-', ' ')}</a>
+                    </Typography>
+                    <Web3NetworkSwitch />
                     {/* <MenuToggle isOpen={isMenuOpen} handlemenuTooggle={handlemenuTooggle} />  */}
                     {
-                        innerWidth < 600 ? '' :
-                            <DropDown title={network.chain?.name}>
-                                {/* {network?.chain?.nativeCurrency?} */}
-                                <Web3NetworkSwitch />
-                            </DropDown>
+                        // innerWidth < 600 ? '' :
+                        //     <DropDown title={network.chain?.name}> 
+                        //         <Web3NetworkSwitch />
+                        //     </DropDown>
                     }
                 </div>
-                <Web3Button balance="show" />
+                <Web3Button
+                    avatar={innerWidth < 700 ? 'hide' : 'show'}
+                    balance={innerWidth < 700 ? 'hide' : 'show'}
+
+                    icon='show' />
             </Box>
         </Box>
     )

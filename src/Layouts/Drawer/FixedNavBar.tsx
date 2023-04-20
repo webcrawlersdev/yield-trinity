@@ -52,6 +52,9 @@ export default function FixedNavBar() {
 
     return (
         <div style={{ maxHeight: '90dvh' }} className={`drawer-main-mobile ${open ? 'mobile-menu-toggled' : ''}`} >
+            {
+                open && <Link className="path-name" style={{ justifyContent: 'flex-start', paddingInline: '1.6rem' }} to={'/'}>YieldTrinity</Link>
+            }
             <List ref={mmenu} className='drawer-main-mobile-lists'  >
                 <ListItemButton sx={styles.lb}    >
                     <Link to={`../${'dashboard'}`} style={styles.lbl}>
@@ -61,13 +64,13 @@ export default function FixedNavBar() {
                 </ListItemButton>
 
                 <ListItemButton sx={styles.lb}  >
-                    <Link to={`../${'account'}`} style={styles.lbl}>
+                    <Link to={`../${'shared-wallet'}`} style={styles.lbl}>
                         <AccountBalanceIcon />
-                        <ListItemText primary={"Account info"} sx={{ opacity: open ? 1 : 0 }} />
+                        <ListItemText primary={"Shared Wallet"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>
                 </ListItemButton>
                 <ListItemButton sx={styles.lb}  >
-                    <Link to={`../${'recto?page=pairs'}`} style={styles.lbl}>
+                    <Link to={`../${'explorer?page=pairs'}`} style={styles.lbl}>
                         <ExploreOutlined />
                         <ListItemText primary={"Explore"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>

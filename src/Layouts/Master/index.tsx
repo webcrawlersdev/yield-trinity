@@ -6,20 +6,18 @@ import Footing from "../Footing";
 import FixedNavBar from "../Drawer/FixedNavBar";
 
 export default ({ children }: { children: React.ReactNode }) => {
-    const [isMenuOpen, setisMenuOpen] = useState<boolean>(false)
-    const toggleMenu = () => setisMenuOpen(o => !o)
     return (
-        <Box sx={{ display: 'flex' }}>
-            <MiniDrawer open={isMenuOpen} />
+        <div style={{ display: 'flex', height: '100vh',overflow:'hidden' }}>
+            <MiniDrawer />
             <Box component="main" className="main-container"  >
-                <Heading isMenuOpen={isMenuOpen} handlemenuTooggle={toggleMenu} />
-                <h1 className="path-name">{window.location.pathname.replace('/', '')}</h1>
+                <Heading />
+                <p className="path-description">New pairs listed on Ethereum exchanges with pool variation in real time</p>
                 <Box className='main-centered'>
                     {children}
                 </Box>
                 <Footing />
                 <FixedNavBar />
             </Box>
-        </Box>
+        </div>
     )
 }

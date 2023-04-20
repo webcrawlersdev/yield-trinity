@@ -17,142 +17,88 @@ import { Box } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import useWindowDimensions from '../../Hooks/useWindowDimensions';
-import { ExploreOutlined } from '@mui/icons-material';
+import { ExploreOutlined, Height } from '@mui/icons-material';
+import { motion } from 'framer-motion'
+
 const drawerWidth = 200;
 
-export const openedMixin = (theme: Theme): CSSObject => ({
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-    }),
-    overflowX: 'hidden',
-});
+export default function MiniDrawer() {
 
-export const closedMixin = (theme: Theme): CSSObject => ({
-    transition: theme.transitions.create('width', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    overflowX: 'hidden',
-    width: `calc(${theme.spacing(7)} + 1px)`,
-    [theme.breakpoints.up('sm')]: {
-        width: `calc(${theme.spacing(8)} + 1px)`,
-    },
-});
-
-
-export const MenuToggle = (props: { isOpen?: boolean, handlemenuTooggle: Function }) => {
-    const isOpen = props.isOpen
-    return (
-        <IconButton onClick={() => props.handlemenuTooggle()}>
-            {isOpen ? <ChevronLeftIcon color='info' /> : <ChevronRightIcon color='info' />}
-        </IconButton>
-    )
-}
-
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
-        width: drawerWidth,
-        flexShrink: 0,
-        whiteSpace: 'nowrap',
-        boxSizing: 'border-box',
-        ...(open && {
-            ...openedMixin(theme),
-            '& .MuiDrawer-paper': openedMixin(theme),
-        }),
-        ...(!open && {
-            ...closedMixin(theme),
-            '& .MuiDrawer-paper': closedMixin(theme),
-        }),
-    }),
-);
-
-
-export default function MiniDrawer({ open: isOpened }: { open: boolean }) {
     const { innerWidth } = useWindowDimensions()
     const [open, setIsOpen] = useState(false)
-
-    useEffect(() => {
-        setIsOpen(o => isOpened)
-        return () => { }
-    }, [isOpened])
-
-
     const styles = {
         lb: {
             minHeight: 48,
             justifyContent: open ? 'initial' : 'center',
             px: 2.5,
-        },
-        lbl: {
-            minWidth: 0,
-            width: open ? 3 : 'auto',
-            justifyContent: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '.6rem',
-            paddingInline: '.6rem'
         }
     }
 
-
+    if (innerWidth <= 600) {
+        return <></>
+    }
     return (
-        <Drawer variant="permanent" open={open} className='drawer-main' >
-            <MenuToggle isOpen={open} handlemenuTooggle={() => setIsOpen(s => !s)} />
-            <Divider />
-            {/* <div className="space-between" > */}
-            <Box sx={{ flexWrap: 'wrap', display: 'flex', alignContent: 'space-between', height: '100%' }}>
-                <List style={{ width: '100%' }}>
-                    <ListItem key={'dashboard'} disablePadding sx={{ display: 'block' }}>
-                        <ListItemButton sx={styles.lb}  >
-                            <Link to={`../${'dashboard'}`} style={styles.lbl}>
-                                <DashboardIcon />
-                                <ListItemText primary={"Dashboard"} sx={{ opacity: open ? 1 : 0 }} />
-                            </Link>
-                        </ListItemButton>
-                    </ListItem>
+        <div className='drawer-menu' >
+            <motion.nav onMouseOver={() => setIsOpen(true)}
+                onMouseOut={() => setIsOpen(false)}
+                className="nav-main">
+                {
+                    open ?
+                        <Link className="path-name" style={{ justifyContent: open ? 'flex-start' : 'center', paddingInline: open ? '1rem' : '.6rem' }} to={'/'}>YieldTrinity</Link>
+                        : <Link className="path-name" to={'/'}>YT</Link>
 
-                    <ListItem key={'account'} disablePadding sx={{ display: 'block' }}>
-                        <ListItemButton sx={styles.lb}  >
-                            <Link to={`../${'account'}`} style={styles.lbl}>
-                                <AccountBalanceIcon />
-                                <ListItemText primary={"Account info"} sx={{ opacity: open ? 1 : 0 }} />
-                            </Link>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem key={'explorer'} disablePadding sx={{ display: 'block' }}>
-                        <ListItemButton sx={styles.lb}  >
-                            <Link to={`../${'recto?page=pairs'}`} style={styles.lbl}>
-                                <ExploreOutlined />
-                                <ListItemText primary={"Explorer | New pairs"} sx={{ opacity: open ? 1 : 0 }} />
-                            </Link>
-                        </ListItemButton>
-                    </ListItem>
-                </List>
+                }
+                <div
+                    style={{ flexWrap: 'wrap', display: 'flex', alignContent: 'space-between', height: '100%' }}>
+                    <List className='nav-ul'>
+                        <ListItem key={'dashboard'} disablePadding className="nav-li">
+                            <ListItemButton sx={styles.lb}  >
+                                <Link to={`../${'dashboard'}`} className='nav-link' >
+                                    <DashboardIcon />
+                                    <ListItemText primary={"Dashboard"} className="nav-name" />
+                                </Link>
+                            </ListItemButton>
+                        </ListItem>
 
-                <List style={{ width: '100%' }}>
-                    <ListItem key={'help'} disablePadding sx={{ display: 'block' }}>
-                        <ListItemButton sx={styles.lb}  >
-                            <Link target='_' to={`https://t.me/yieldTrinity`} style={styles.lbl}>
-                                <HelpCenterOutlined />
-                                <ListItemText primary={"Info"} sx={{ opacity: open ? 1 : 0 }} />
-                            </Link>
-                        </ListItemButton>
-                    </ListItem>
+                        <ListItem key={'account'} className="nav-li">
+                            <ListItemButton sx={styles.lb}  >
+                                <Link to={`../${'shared-wallet'}`} className='nav-link' >
+                                    <AccountBalanceIcon />
+                                    <ListItemText primary={"Shared Wallet"} className="nav-name" />
+                                </Link>
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem key={'explorer'} className="nav-li">
+                            <ListItemButton sx={styles.lb}  >
+                                <Link to={`../${'explorer?page=pairs'}`} className='nav-link' >
+                                    <ExploreOutlined />
+                                    <ListItemText className="nav-name" primary={"Explorer New pairs"} />
+                                </Link>
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
 
-                    <ListItem key={'info'} disablePadding sx={{ display: 'block' }}>
-                        <ListItemButton sx={styles.lb}  >
-                            <Link to={`../${'info'}`} style={styles.lbl}>
-                                <InfoOutlinedIcon />
-                                <ListItemText primary={"App info"} sx={{ opacity: open ? 1 : 0 }} />
-                            </Link>
-                        </ListItemButton>
-                    </ListItem>
-                </List>
-            </Box>
-            {/* </div> */}
-            <Divider />
-        </Drawer>
-    );
+                    <List className='nav-ul'>
+                        <ListItem key={'help'} className="nav-li">
+                            <ListItemButton sx={styles.lb}  >
+                                <Link target='_' to={`https:t.me/yieldTrinity`} className='nav-link' >
+                                    <HelpCenterOutlined />
+                                    <ListItemText primary={"Info"} className="nav-name" />
+                                </Link>
+                            </ListItemButton>
+                        </ListItem>
+
+                        <ListItem key={'info'} className="nav-li">
+                            <ListItemButton sx={styles.lb}  >
+                                <Link to={`../${'info'}`} className='nav-link' >
+                                    <InfoOutlinedIcon />
+                                    <ListItemText primary={"App info"} className="nav-name" />
+                                </Link>
+                            </ListItemButton>
+                        </ListItem>
+                    </List>
+                </div>
+            </motion.nav>
+        </div>
+    )
 }
