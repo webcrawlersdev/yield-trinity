@@ -1,10 +1,4 @@
-import { styled, Theme, CSSObject } from '@mui/material/styles';
-import MuiDrawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import HelpCenterOutlined from '@mui/icons-material/HelpCenterOutlined'
 import ListItem from '@mui/material/ListItem';
@@ -12,12 +6,11 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
-import { Box } from '@mui/material'
 
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import useWindowDimensions from '../../Hooks/useWindowDimensions';
-import { ExploreOutlined, Height } from '@mui/icons-material';
+import { ExploreOutlined, Height, RocketLaunch, SnippetFolder } from '@mui/icons-material';
 import { motion } from 'framer-motion'
 
 const drawerWidth = 200;
@@ -30,7 +23,6 @@ export default function MiniDrawer() {
         lb: {
             minHeight: 48,
             justifyContent: open ? 'initial' : 'center',
-            px: 2.5,
         }
     }
 
@@ -68,11 +60,21 @@ export default function MiniDrawer() {
                                 </Link>
                             </ListItemButton>
                         </ListItem>
+
+                        <ListItem key={'snipper'} className="nav-li">
+                            <ListItemButton sx={styles.lb}  >
+                                <Link to={`../${'snipper'}`} className='nav-link' >
+                                    <RocketLaunch />
+                                    <ListItemText primary={"Token Snipper"} className="nav-name" />
+                                </Link>
+                            </ListItemButton>
+                        </ListItem>
+
                         <ListItem key={'explorer'} className="nav-li">
                             <ListItemButton sx={styles.lb}  >
                                 <Link to={`../${'explorer?page=pairs'}`} className='nav-link' >
                                     <ExploreOutlined />
-                                    <ListItemText className="nav-name" primary={"Explorer New pairs"} />
+                                    <ListItemText className="nav-name" primary={"New pairs"} />
                                 </Link>
                             </ListItemButton>
                         </ListItem>

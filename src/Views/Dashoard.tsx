@@ -2,7 +2,7 @@ import Master from "../Layouts/Master"
 import { Grid, Box, Typography, Button, Divider, LinearProgress } from '@mui/material/'
 import { useNetwork, useContractReads, useContractRead, useProvider } from 'wagmi'
 import { fmWei, fmtNumCompact, precise } from "../Helpers"
-import { SHARED_WALLET as SABI } from "../Ethereum/ABIs/SharedWallet"
+import { SHARED_WALLET as SABI } from "../Ethereum/ABIs/index.ts"
 import { useADDR } from "../Ethereum/Addresses"
 import { useEffect, useState } from "react"
 import { ArrowRight, InfoOutlined } from "@mui/icons-material"
@@ -22,7 +22,7 @@ export default () => {
     const ADDR = useADDR(chain?.id)
 
     const useDate: IcontractRead = { functionName: 'getLastPair', abi: SABI, address: ADDR['PRICE_ORACLEA'] }
-    const { data: lastPair } = useContractRead({ ...(useDate as any), watch: true })
+    const { data: lastPair } = useContractRead({ ...(useDate as any), watch: true, args: [ADDR?.DEXS[1]?.FACTORY] })
 
     const { data: ttkn } = useContractRead({
         ...(useDate as any), functionName: "getTokenFromPair", args: [lastPair], watch: true
@@ -172,7 +172,7 @@ export default () => {
                                     Early Access
                                 </Button>
                             </Link>
-                            <a href={`../recto?page=pairs`}
+                            <a href={`../explorer?page=pairs`}
                                 className="space-between">
                                 <Button className=" primary-button">
                                     New Pairs<ArrowRight />

@@ -8,6 +8,7 @@ import SharedWallet from './Views/SharedWallet';
 import Dashboard from './Views/Dashoard';
 import Explorer from './Views/Explorer';
 import Info from './Views/Info';
+import Snipper from './Views/Snipper';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path='shared-wallet' element={<SharedWallet />} />
           <Route path='dashboard' element={<Dashboard />} />
           <Route path='explorer' element={<Explorer />} />
+          <Route path='snipper' element={<Snipper />} />
           <Route path='info' element={<Info />} />
           <Route path='*' element={<E404Page />} />
         </Routes>

@@ -1,25 +1,66 @@
-import { ArrowDownward, ArrowDropDown, ArrowRight, SwapHorizRounded } from '@mui/icons-material'
+import { Add, ArrowDownward, ArrowDropDown, ArrowRight, SwapHorizRounded } from '@mui/icons-material'
 import { Box, Button, Divider } from '@mui/material/'
-import { useNetwork } from 'wagmi'
+import { useNetwork, useContractReads, useContractRead } from 'wagmi'
 import useWindowDimensions from '../../Hooks/useWindowDimensions'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useADDR } from '../../Ethereum/Addresses'
+import ContentModal from '../../Components/Modal'
+import { useState } from 'react'
+import { PRICE_ORACLE } from '../../Ethereum/ABIs/index.ts'
+import { cut } from '../../Helpers'
 
 export default () => {
-
     const { chain } = useNetwork()
     const { innerWidth } = useWindowDimensions()
-    const [q, setSearchParams] = useSearchParams({ dex: 'uniswap' });
-    const ADDR = useADDR(chain?.id)
-    const dex = (ADDR?.DEXS as any)?.[(q.get('dex') as any).toUpperCase().replace(/[^a-zA-Z]+/g, '')]
-    console.log(dex, (q.get('dex') as any).toUpperCase().replace(/[^a-zA-Z]+/g, ''))
+    const [q, setSearchParams] = useSearchParams({ dex: 'uniswap', });
+    const [sDxs, setSDxs] = useState(false)
+    const ADDR = useADDR(chain?.id);
+
+    const dex = (ADDR?.DEXS as any)?.filter((d: any) => d?.NAME?.includes((q.get('dex') as any)?.toLowerCase()?.replace(/[^a-zA-Z]+/g, '')))[0]
+   
+    const handleNewDexSelected = (dexname: string) => {
+        setSDxs(false)
+        setSearchParams({ page: q.get('page') as any, dex: dexname })
+    }
+
+    const { data: newPairs, } = useContractRead({
+        'abi': PRICE_ORACLE,
+        'functionName': 'getLastPair',
+        'address': ADDR['PRICE_ORACLEA'],
+        args: [dex?.FACTORY],
+        watch: true
+    })
+
+
+
     return (
-        <Box sx={{ width: '100%' }} >
+        <div style={{ width: '100%', height: 'max-content' }} >
             <div className="page-navigator">
-                <div className="space-between">
-                    <Button variant='contained' style={{ padding: '.2rem' }} className={`primary-button dark-button ${!dex?.NAME && 'error'}`}>
+                <div className="space-between relative-container ">
+                    <Button
+                        onClick={() => setSDxs(o => !o)}
+                        variant='contained'
+                        style={{ padding: '.2rem' }}
+                        className={`primary-button dark-button ${!dex?.NAME && 'error'}`}>
                         <img src={dex?.ICON} alt={dex?.SYMBOL} className="icon" />&nbsp;{dex?.NAME ?? `Invalid DEX`}&nbsp;<ArrowDropDown />
                     </Button>
+                    <ContentModal shown={sDxs}>
+                        <div className="flexed-tabs">
+                            {
+                                (ADDR?.DEXS as any)?.map((dex: any) => {
+                                    if (!(dex?.NAME?.includes((q.get('dex') as any)?.toLowerCase()?.replace(/[^a-zA-Z]+/g, '')))) {
+                                        return <Button
+                                            onClick={() => handleNewDexSelected(dex?.NAME)}
+                                            variant='contained' style={{ padding: '.2rem' }}
+                                            className={`primary-button dark-button flexed-tab ${!dex?.NAME && 'error'}`}>
+                                            <img src={dex?.ICON} alt={dex?.SYMBOL} className="icon" />&nbsp;{dex?.NAME ?? `Invalid DEX`}
+                                        </Button>
+                                    }
+                                    return <></>
+                                })
+                            }
+                        </div>
+                    </ContentModal>
                 </div>
                 <div className="filter-input-wrapper">
                     <input className="input-reading"
@@ -53,9 +94,9 @@ export default () => {
                                         <div className="space-between">
                                             <span></span>
                                             <div className="space-between">
-                                                <a target="_balnk" href={''} >
+                                                <a target="_balnk" href={`${chain?.blockExplorers?.default?.url}/address/${newPairs}`} >
                                                     <Button className=" primary-button">
-                                                        0x0***0000<ArrowRight />
+                                                        {cut(newPairs)}<ArrowRight />
                                                     </Button>
                                                 </a>
                                                 <SwapHorizRounded />
@@ -68,6 +109,6 @@ export default () => {
                     }
                 </ul>
             </div>
-        </Box>
+        </div>
     )
 }

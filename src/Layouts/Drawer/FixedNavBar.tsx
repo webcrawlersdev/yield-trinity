@@ -72,7 +72,7 @@ export default function FixedNavBar() {
                 <ListItemButton sx={styles.lb}  >
                     <Link to={`../${'explorer?page=pairs'}`} style={styles.lbl}>
                         <ExploreOutlined />
-                        <ListItemText primary={"Explore"} sx={{ opacity: open ? 1 : 0 }} />
+                        <ListItemText primary={"New pairs"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>
                 </ListItemButton>
 

@@ -15,17 +15,31 @@ const AVAILABLE_CHAINS = [NETWORKS.AVAX, NETWORKS.FANTOM, NETWORKS.ETH, NETWORKS
 const ADDRESSES = {
     [97]: {
         SHARED_WALLET: "0xE66B70549FDc0278877E91D007E33d5b6A32b682",
-        PRICE_ORACLEA: "0x70916D2Ee5F0696161Be68795792bAF1FCbB0671",
+        PRICE_ORACLEA: "0x280e61f997eceE738899674d7071626836ab5E51",
         WETH_ADDRESSA: "0xae13d989dac2f0debff460ac112a837c89baa7cd",
-        DEXS: {
-            UNISWAP: {
+        DEXS: [
+            {
                 ROUTER: "",
                 FACTORY: "",
                 ICON: UniswapIcons,
                 NAME: 'uniswap',
                 SYMBOL: 'UNI'
-            }
-        }
+            },
+            {
+                ROUTER: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
+                FACTORY: "0x6725f303b657a9451d8ba641348b6761a6cc7a17",
+                ICON: UniswapIcons,
+                NAME: 'pancakeswap',
+                SYMBOL: 'CAKE'
+            },
+            {
+                ROUTER: "",
+                FACTORY: "",
+                ICON: UniswapIcons,
+                NAME: 'kyberswap',
+                SYMBOL: 'UNI'
+            },
+        ]
     }
 }
 

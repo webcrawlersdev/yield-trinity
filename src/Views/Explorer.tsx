@@ -13,7 +13,7 @@ export default () => {
 
     return (
         <Master>
-            <Grid className="dash" style={{ borderRadius: 20 }}>
+            <Grid className="dash" >
                 {searchParams.get('page') === 'pairs' && <ExploreNewPairs />}
                 {searchParams.get('page') === 'swap' && <SwapTokens />}
             </Grid>

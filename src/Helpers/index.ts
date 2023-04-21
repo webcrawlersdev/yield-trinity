@@ -21,3 +21,15 @@ export const fmtNumCompact = (val: number | string): string => {
     const formatter = Intl.NumberFormat("en", { notation: "compact" });
     return formatter.format(Number(val));
 }
+
+export const cut = (val: string | number | unknown, position: "middle" | "left" | "right" | undefined = "middle") => {
+    const valz = String(val)
+    switch (position) {
+        case "left":
+            return '...' + valz.slice(-4)
+        case "middle":
+            return valz.slice(0, 3) + '...' + valz.slice(-3)
+        case "right":
+            return valz.slice(0, 4) + '...'
+    }
+}

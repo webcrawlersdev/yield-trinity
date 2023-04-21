@@ -9,7 +9,7 @@ import { useAccount, useNetwork, useContractWrite, useContractReads, useBalance,
 import { Web3Button } from '@web3modal/react'
 import CancelIcon from '@mui/icons-material/CancelOutlined'
 import { useADDR } from "../Ethereum/Addresses"
-import { SHARED_WALLET as SABI } from "../Ethereum/ABIs/SharedWallet"
+import { SHARED_WALLET as SABI } from "../Ethereum/ABIs/index.ts"
 import { fmWei, precise, toWei } from '../Helpers'
 import { toast } from 'react-toastify'
 import useAssets from "../Assets"
