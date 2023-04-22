@@ -2,8 +2,6 @@ export const SHARED_WALLET = [
     "function deposit(uint256 _lockPeriod) payable ",
     "function withdraw(uint256 amount)",
     "function borrowall()",
-
-    "function getLastPair() public view returns (address pair)",
     "function ownershipPercentage(address user) public view returns (uint256)",
     "function conspectus(address user) public view returns (uint256)",
     "function minLockPeriod() public view returns (uint256)",
@@ -12,8 +10,7 @@ export const SHARED_WALLET = [
     "function owner () public view returns (address)",
     "function withdrawalFee () public view returns (uint256)",
     "function dilutedEarning(address user) view returns (uint256)",
-    "function potentialEarn(address user) view returns (uint256)",
-    "function getTokensLiquidity( address _token1,  address _token2 ) public view returns (uint256 token1, uint256 token2)",
+    "function potentialEarn(address user) view returns (uint256)", 
     "function getTokenPairReserves(address pairAddress) public  view returns (uint256 token0Reserve, uint256 reserve1Reserve)",
     "function getTokenFromPair( address pair  ) public view returns (address tokenAddress, bool isValid)",
     "function getTokenPriceInWETH( address _token  ) public view returns (uint256 priceInWETH)",
@@ -25,6 +22,10 @@ export const SHARED_WALLET = [
 ]
 
 export const PRICE_ORACLE = [
+    "function decimals() public view returns (uint256)",
+    "function name() public view returns (string memory)",
+    "function symbol() public view returns (string memory)",
+    "function balanceOf(address account) external view returns (uint256)",
     "function quotes(address _router, address _token1, address _token2, address _factory, uint256 _amount) external view returns(uint256 currentPrice)",
     "function quoteByPair(address _router, address _pair, uint256 _amount, address _factory) external view returns(uint256 currentQuote)",
     "function getPathForToken(address tokenIn, address tokenOut) external pure returns(address[] memory)",
@@ -34,4 +35,14 @@ export const PRICE_ORACLE = [
     "function getLastPair(address _factory) external view returns(address pair)",
     "function predictFuturePrices(address[] calldata routes, address[] calldata path, uint256 amountIn) external view returns(uint256[] memory prices)",
     "function _predictPrice(address _route, address[] memory path, uint256 _amount) external view returns(uint256 price)",
+    "function hasLiquidity(address _token1, address _token2,address _factory) public view returns(bool hasliquidity)",
+    "function tokensLiquidity(  address _token1,  address _token2, address _factory  ) public view returns(uint256 base, uint256 token)",
+    "function getTokenFromPair(address _pair) public  view  returns(address tokenAddress, bool isValid)",
+    // "function getTokenInfo(address _token) public  view returns(TokenInfo memory)",
+    "function priceImpacts( address _token0, address _token1, address[] memory _fatories, uint256 amount) public view returns(uint256[] memory impacts)",
+    "function getTokenPairReserves(address _pair, address _factory) public  view returns(uint256 token0Reserve, uint256 reserve1Reserve)",
+    "function getTokensFromPair(address _pair)    public   view  returns(address token0, address token1)",
+    "function getRouteOutputs(address[] calldata routes, address[] calldata path, uint256 amountIn ) public view returns (uint256[] memory outputs)",
+    "function priceInToken(address _token0,   address _token1,  address _router,  address _factory ) public view returns(uint256 price)",
+    "function swap(address[] calldata _path, uint256 _amountIn, uint256 _minAmountOut, address _router) public payable"
 ]

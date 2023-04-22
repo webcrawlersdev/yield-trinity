@@ -113,7 +113,7 @@ export default () => {
                 {
                     isConnected ?
                         <Typography component={'p'} >
-                            Your current ownership stake in the  pool capitalization is <span className="green">%{u_loading ? 'loading' : precise((userDatas as any)?.[1] ?? 0)}</span>
+                            Your current ownership stake in the  pool capitalization is <span className="green">{u_loading ? 'loading' : precise((userDatas as any)?.[1] ?? 0)}%</span>
                         </Typography>
                         :
                         <Typography component={'p'} >
@@ -305,7 +305,7 @@ export default () => {
                             </Typography>
                             <Typography component='p'>
                                 <span className="orangered">
-                                    %{u_loading ? '---' : precise((userDatas as any)?.[1] ?? 0)}
+                                    {u_loading ? '---' : precise((userDatas as any)?.[1] ?? 0)}%
                                 </span>
                             </Typography>
                         </div>

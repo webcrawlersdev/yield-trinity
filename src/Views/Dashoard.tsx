@@ -2,7 +2,7 @@ import Master from "../Layouts/Master"
 import { Grid, Box, Typography, Button, Divider, LinearProgress } from '@mui/material/'
 import { useNetwork, useContractReads, useContractRead, useProvider } from 'wagmi'
 import { fmWei, fmtNumCompact, precise } from "../Helpers"
-import { SHARED_WALLET as SABI } from "../Ethereum/ABIs/index.ts"
+import { SHARED_WALLET as SABI, PRICE_ORACLE as PABI } from "../Ethereum/ABIs/index.ts"
 import { useADDR } from "../Ethereum/Addresses"
 import { useEffect, useState } from "react"
 import { ArrowRight, InfoOutlined } from "@mui/icons-material"
@@ -21,7 +21,7 @@ export default () => {
     const [nBal, setNBal] = useState('0.00')
     const ADDR = useADDR(chain?.id)
 
-    const useDate: IcontractRead = { functionName: 'getLastPair', abi: SABI, address: ADDR['PRICE_ORACLEA'] }
+    const useDate: IcontractRead = { functionName: 'getLastPair', abi: PABI, address: ADDR['PRICE_ORACLEA'] }
     const { data: lastPair } = useContractRead({ ...(useDate as any), watch: true, args: [ADDR?.DEXS[1]?.FACTORY] })
 
     const { data: ttkn } = useContractRead({
@@ -35,14 +35,12 @@ export default () => {
 
     const { data: tokenInfo } = useContractReads({
         contracts: [
-            { abi: SABI, address: (ttkn as any)?.[0], functionName: "name" },
-            { abi: SABI, address: (ttkn as any)?.[0], functionName: "decimals" },
-            { abi: SABI, address: (ttkn as any)?.[0], functionName: "symbol" }
+            { abi: PABI, address: (ttkn as any)?.[0], functionName: "name" },
+            { abi: PABI, address: (ttkn as any)?.[0], functionName: "decimals" },
+            { abi: PABI, address: (ttkn as any)?.[0], functionName: "symbol" }
         ],
         watch: true
     })
-
-    console.log((ttkn as any)?.[0], tokenInfo)
 
     const trackingNewPair = useContractReads({
         contracts: [
@@ -167,7 +165,7 @@ export default () => {
                         }
 
                         <div className="space-between">
-                            <Link to={`../recto?page=swap&&pair=${lastPair}`}>
+                            <Link to={`../snipper?pair=${lastPair}&dex=uniswap`}>
                                 <Button className=" primary-button">
                                     Early Access
                                 </Button>

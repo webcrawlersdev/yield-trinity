@@ -10,7 +10,6 @@ import Explorer from './Views/Explorer';
 import Info from './Views/Info';
 import Snipper from './Views/Snipper';
 
-
 function App() {
   useAssets()
   return (
