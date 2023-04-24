@@ -12,8 +12,14 @@ export const fmWei = (val: string | number, decimals: undefined | string | numbe
     return vals
 }
 
-export const toWei = (val: string | number, decimals: undefined | number = 18): ethers.BigNumber => {
+export const toWei = (val: string | number, decimals: undefined | number = 18): ethers.BigNumber | number => {
+    if (!val || !decimals) return ethers.utils.parseUnits(String(0), 18)
     const vals = ethers.utils.parseUnits(String(val), decimals)
+    return vals
+}
+
+export const toBN = (val: string | number): ethers.BigNumber => {
+    const vals = ethers.BigNumber.from(val)
     return vals
 }
 

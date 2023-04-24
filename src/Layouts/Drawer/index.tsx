@@ -70,14 +70,14 @@ export default function MiniDrawer() {
                             </ListItemButton>
                         </ListItem>
 
-                        <ListItem key={'explorer'} className="nav-li">
+                        {/* <ListItem key={'explorer'} className="nav-li">
                             <ListItemButton sx={styles.lb}  >
                                 <Link to={`../${'explorer?page=pairs'}`} className='nav-link' >
                                     <ExploreOutlined />
                                     <ListItemText className="nav-name" primary={"New pairs"} />
                                 </Link>
                             </ListItemButton>
-                        </ListItem>
+                        </ListItem> */}
                     </List>
 
                     <List className='nav-ul'>

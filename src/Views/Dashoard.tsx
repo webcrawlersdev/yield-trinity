@@ -96,9 +96,9 @@ export default () => {
                             variant="contained"
                             className="primary-button bg-red"
                             style={{ width: '100%', marginTop: '1rem' }}
-                            onClick={() => window.location.href = '../account'}
+                            onClick={() => window.location.href = '../shared-wallet'}
                         >
-                            Contribute Now
+                            Earn passive income
                         </Button>
                     </div>
                 </Box>

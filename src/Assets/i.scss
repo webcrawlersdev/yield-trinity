@@ -313,6 +313,10 @@
      }
  }
 
+ .uppercase {
+     text-transform: capitalize !important;
+ }
+
  .expanded-container {
      padding: 1rem;
      width: 400px;

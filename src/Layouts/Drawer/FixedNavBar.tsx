@@ -69,12 +69,12 @@ export default function FixedNavBar() {
                         <ListItemText primary={"Shared Wallet"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>
                 </ListItemButton>
-                <ListItemButton sx={styles.lb}  >
+                {/* <ListItemButton sx={styles.lb}  >
                     <Link to={`../${'explorer?page=pairs'}`} style={styles.lbl}>
                         <ExploreOutlined />
                         <ListItemText primary={"New pairs"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>
-                </ListItemButton>
+                </ListItemButton> */}
 
                 <ListItemButton sx={styles.lb}  >
                     <Link to={`https://t.me/yieldTrinity`} style={styles.lbl}>

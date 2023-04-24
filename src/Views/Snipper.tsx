@@ -1,16 +1,28 @@
 import { Box, Button, CircularProgress, Divider, Grid, Input, Radio, Switch } from "@mui/material";
 import Master from "../Layouts/Master";
 import { Web3Button } from "@web3modal/react";
-import { ArrowDropDown, ArrowRight, Balance, DoubleArrow, Fullscreen, FullscreenExit, SwapHoriz } from "@mui/icons-material";
-import { useAccount, useContractRead, useContractReads, useContractWrite, useNetwork, useProvider } from "wagmi";
+import { AccountBalance, ArrowDropDown, ArrowRight, Balance, DoubleArrow, Fullscreen, FullscreenExit, WalletOutlined } from "@mui/icons-material";
+import {
+    useAccount, useContractRead,
+    useContractReads,
+    useContractWrite,
+    useNetwork,
+    useProvider,
+    useToken,
+    usePrepareContractWrite,
+    useSendTransaction,
+    usePrepareSendTransaction,
+    useBalance
+} from "wagmi";
 import ContentModal from "../Components/Modal";
 import { useADDR } from "../Ethereum/Addresses";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from 'react'
-import { cut, fmWei, precise, toWei } from "../Helpers";
+import { cut, fmWei, precise, toBN, toWei } from "../Helpers";
 import { motion } from 'framer-motion'
 import { PRICE_ORACLE } from '../Ethereum/ABIs/index.ts'
 import { fmtNumCompact } from "../Helpers";
+import { toast } from 'react-toastify'
 
 export default function Snipper() {
     const { isConnected, address, } = useAccount()
@@ -21,9 +33,10 @@ export default function Snipper() {
     const [q, setSearchParams] = useSearchParams({ dex: 'uniswap', });
     const [baseBalance, setBasebalance] = useState<string | number>(0)
     const [expandContainer, setExpnadContainer] = useState(true)
+    const [routeOutput, setRouteOutputs] = useState<any>()
     const [tradeSide, setTradeSide] = useState({
         side: 'buy',
-        amount: 0
+        amount: precise(Math.random() * 2)
     })
     const [pairInfo, setPairInfo] = useState({
         tnxCount: 0
@@ -47,73 +60,90 @@ export default function Snipper() {
         watch: true
     })
 
-    const { data: token0 } = useContractReads({
-        contracts: [
-            { abi: PRICE_ORACLE, address: (Pairs as any)?.[0], functionName: "name" },
-            { abi: PRICE_ORACLE, address: (Pairs as any)?.[0], functionName: "symbol" },
-            { abi: PRICE_ORACLE, address: (Pairs as any)?.[0], functionName: "decimals" },
-            { abi: PRICE_ORACLE, address: (Pairs as any)?.[0], functionName: "balanceOf", args: [q.get('pair')] },
-        ],
-    })
-    const { data: token1 } = useContractReads({
-        contracts: [
-            { abi: PRICE_ORACLE, address: (Pairs as any)?.[1], functionName: "name" },
-            { abi: PRICE_ORACLE, address: (Pairs as any)?.[1], functionName: "symbol" },
-            { abi: PRICE_ORACLE, address: (Pairs as any)?.[1], functionName: "decimals" },
-            { abi: PRICE_ORACLE, address: (Pairs as any)?.[1], functionName: "balanceOf", args: [q.get('pair')] },
-        ],
-    })
-
+    const { data: token0 } = useToken({ address: (Pairs as any)?.[0] })
+    const { data: token1 } = useToken({ address: (Pairs as any)?.[1] })
+    const { data: token0Balance } = useBalance({ address, token: token0?.address, watch: true })
+    const { data: token1Balance } = useBalance({ address, token: token1?.address, watch: true })
+    const { data: token0InPool } = useBalance({ address: q.get('pair') as any, token: token0?.address, watch: true })
+    const { data: token1InPool } = useBalance({ address: q.get('pair') as any, token: token1?.address, watch: true })
     const { data: currentPrice } = useContractRead({
         abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "priceInToken",
-        args: [(Pairs as any)?.[0], (Pairs as any)?.[1], dex.ROUTER, dex.FACTORY],
+        args: [token0?.address, token1?.address, dex.ROUTER, dex.FACTORY],
         watch: true,
-        enabled: Boolean(Pairs)
+        enabled: Boolean(token0?.address && token1?.address)
     })
-
     const { data: outputs, isLoading: isFetchingOutput } = useContractReads({
         contracts: [{
             abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "getRouteOutputs",
             args: [
                 [dex.ROUTER],
-                (tradeSide.side === 'sell') ? [(Pairs as any)?.[1], (Pairs as any)?.[0]] : [(Pairs as any)?.[0], (Pairs as any)?.[1]],
-                toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? (token1 as any)?.[2] : (token0 as any)?.[2])
+                (tradeSide.side === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
+                toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals)
             ]
-        },
-        {
+        }, {
             abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "predictFuturePrices",
             args: [
                 [dex.ROUTER],
-                (tradeSide.side === 'sell') ? [(Pairs as any)?.[1], (Pairs as any)?.[0]] : [(Pairs as any)?.[0], (Pairs as any)?.[1]],
-                toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? (token1 as any)?.[2] : (token0 as any)?.[2])
+                (tradeSide.side === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
+                toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals)
             ]
-        },
-        {
+        }, {
             abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "priceImpacts",
             args: [
-                (Pairs as any)?.[1], (Pairs as any)?.[0],
+                token1?.address, token0?.address,
                 [dex.FACTORY],
-                toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? (token1 as any)?.[2] : (token0 as any)?.[2])
+                toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals)
             ]
         }
         ], watch: true, enabled: Boolean(!Number.isNaN(tradeSide.amount))
     })
 
-    const { data, isLoading: isTransacting, isSuccess, error, isError, write: transact } = useContractWrite({
-        mode: 'recklesslyUnprepared',
+    const { config, error } = usePrepareContractWrite({
         address: ADDR['PRICE_ORACLEA'], abi: PRICE_ORACLE, functionName: 'swap',
-        // overrides: tnxMode === 'deposit' ? { value: toWei(amount) } : {},
+        overrides: {
+            // customData: [token0?.address],
+            value: toWei(tradeSide.amount, (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals),
+        },
         args: [
-            (tradeSide.side === 'sell') ? [(Pairs as any)?.[1], (Pairs as any)?.[0]] : [(Pairs as any)?.[0], (Pairs as any)?.[1]],
-            toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? (token1 as any)?.[2] : (token0 as any)?.[2]),
-            toWei((outputs as any)?.[1], tradeSide.side === 'sell' ? (token0 as any)?.[2] : (token1 as any)?.[2]),
-            [dex.ROUTER],
-        ]
+            (tradeSide.side === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
+            toWei(tradeSide?.amount, (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals),
+            toWei(routeOutput?.RoutOutputs, (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals),
+            dex.ROUTER,
+            120
+        ],
     })
 
+    const { data: hasSwapData, isLoading: isTransacting, write: transact, isError: swapHasE, error: swapE, reset: resetSwap } =
+        useContractWrite(config)
+
+    console.log(error, "PREPARE HAD ERROR")
+
+    useEffect(() => {
+        const outPuts = fmWei((outputs as any)?.[0], tradeSide.side === 'sell' ? token0?.decimals : token1?.decimals)
+        const future = fmWei((outputs as any)?.[1], tradeSide.side === 'sell' ? token0?.decimals : token1?.decimals)
+        setRouteOutputs((o: any) => o = {
+            ...o,
+            RoutOutputs: outPuts,
+            FuturePrice: future
+        })
+
+    }, [outputs,])
 
 
     useEffect(() => {
+        const toastId = 'TRANSACTING'
+        if (hasSwapData) {
+            toast.promise(hasSwapData.wait,
+                { 'error': 'error', 'success': 'Swap Succcessful', 'pending': `Wait, Swapping...` },
+                { toastId })
+            resetSwap()
+        }
+
+        if (swapHasE) {
+            toast.error('Something went wrong\n\ncheck if: INSUFFICIENT_BALANCE\nREFLECTIONAL_TOKEN', { toastId })
+            resetSwap()
+        }
+
         (async () => {
             const base = await Provider.getBalance(String(address))
             setBasebalance(o => o = precise(fmWei(String(base))))
@@ -130,7 +160,7 @@ export default function Snipper() {
         }
 
         setPriceData((p) => {
-            const _cp = Number(fmWei(currentPrice as any ?? 0, Number(token1?.[2])))
+            const _cp = Number(fmWei(currentPrice as any ?? 0, token1?.decimals))
             const _op = Number(p.current)
             const __pd = _op - _cp
             const _pd = (__pd / _cp) * 100
@@ -142,7 +172,7 @@ export default function Snipper() {
             }
         })
 
-    }, [currentPrice, dataDisplayType, Provider, address, q, token1])
+    }, [currentPrice, dataDisplayType, q, token1, hasSwapData, swapHasE, swapE])
 
     const handleSwap = () => {
         transact?.()
@@ -195,17 +225,17 @@ export default function Snipper() {
                     <div className="table-small-inner">
                         <span >BUY PRICE</span>
                         <span>0.00</span>
-                        <span className="green">12%</span>
+                        <span className="green">0.00%</span>
                     </div>
                     <div className="table-small-inner">
                         <span >SELLING PRICE</span>
                         <span>0.00</span>
-                        <span className="green">12%</span>
+                        <span className="green">0.00%</span>
                     </div>
                     <div className="table-small-inner">
                         <span >POT. PROFIT</span>
                         <span>0.00</span>
-                        <span className="green">12%</span>
+                        <span className="green">0.00%</span>
                     </div>
                 </div>
             </div>
@@ -217,14 +247,14 @@ export default function Snipper() {
             <div className="two-flexed-inner">
                 <div className="table-small">
                     <div className="table-small-inner">
-                        <span > {(token0 as any)?.[1]} IN POOL </span>
+                        <span > {token0InPool?.symbol} IN POOL </span>
                         <span></span>
-                        <span>{precise(fmWei((token0 as any)?.[3], (token0 as any)?.[2]), 5)}</span>
+                        <span>{token0InPool?.formatted}</span>
                     </div>
                     <div className="table-small-inner">
-                        <span > {(token1 as any)?.[1]} IN POOL </span>
+                        <span > {token1InPool?.symbol} IN POOL </span>
                         <span></span>
-                        <span>{precise(fmWei((token1 as any)?.[3], (token1 as any)?.[2]), 5)}</span>
+                        <span>{token1InPool?.formatted}</span>
                     </div>
                     <div className="table-small-inner">
                         <span className="orangered"> TOTAL VALUATION </span>
@@ -275,7 +305,7 @@ export default function Snipper() {
         {!Pairs ? <h3 className="headline-3" style={{ padding: '2rem', textAlign: 'center' }}>NOT ENOUGH DATA</h3> :
             <Box>
                 <h3 className="headline-3   space-between" style={{ marginTop: '1rem', marginBottom: 0 }}>
-                    {(token0 as any)?.[1]}/{(token1 as any)?.[1]}
+                    {token0?.symbol}/{token1?.symbol}
                     <div className="space-between" style={{ gap: 0 }}>
                         <a target="_" className="green" href={`${chain?.blockExplorers?.default?.url}/address/${q.get('pair')}`}>&nbsp;{cut(q.get('pair'))}</a>
                         <ArrowRight />
@@ -325,67 +355,66 @@ export default function Snipper() {
 
                             <div className="space-between" style={{ width: '100%', marginTop: '1rem', }}>
                                 <Button
-                                    className="secondary-button primary-button"
+                                    className="secondary-button"
                                     variant="contained"
                                     style={{ width: '100%' }}
                                     onClick={() => setTradeSide(t => t = { ...t, side: 'buy' })}>
-                                    {(token0 as any)?.[1]}
                                     <Radio checked={tradeSide.side === 'buy'} />
+                                    {token0Balance?.symbol} {precise(token0Balance?.formatted ?? 0, 3)}
                                 </Button>
                                 <Button
-                                    className="secondary-button primary-button"
+                                    className="secondary-button"
                                     variant="contained"
                                     style={{ width: '100%' }}
                                     onClick={() => setTradeSide(t => t = { ...t, side: 'sell' })}>
-                                    {(token1 as any)?.[1]}
                                     <Radio checked={tradeSide.side === 'sell'} />
+                                    {token1Balance?.symbol} {precise(token1Balance?.formatted ?? 0, 3)}
                                 </Button>
                             </div>
-
-                            <Box className="alone-contianer " style={{ padding: '.4rem', marginTop: '1rem' }}>
-                                <label className="absolute-label space-between">
-                                    Amount
-                                    <span className="small-text flex-left"><Balance /> {chain?.nativeCurrency?.symbol} ~{baseBalance}</span>
-                                </label>
+                            <Button className="" style={{ marginTop: '1rem' }}>
+                                {chain?.nativeCurrency?.symbol}&bull;{baseBalance}
+                            </Button>
+                            <Box className="alone-contianer " style={{ padding: '.4rem', marginTop: '.5rem' }}>
                                 <Divider />
                                 <div className="space-between" style={{ gap: 0 }}>
                                     <Input
                                         type="number"
                                         value={tradeSide.amount}
                                         maxRows={1}
+                                        autoFocus
                                         error={String(tradeSide.amount).length > 15 ? true : false}
                                         className="input-reading transparent-input"
                                         onChange={(i: any) => setTradeSide(a => a = { ...a, amount: String(tradeSide.amount).length <= 15 && i.target.valueAsNumber })}
-                                        placeholder={`${tradeSide.side === 'sell' ? (token1 as any)?.[1] : (token0 as any)?.[1]} 0.00`}
+                                        placeholder={`${tradeSide.side === 'sell' ? token1?.symbol : token0?.symbol} 0.00`}
                                     />
                                     <div className="space-between" style={{ gap: 0 }}>
                                         <Button>100%</Button>
                                         <Button>50%</Button>
                                     </div>
                                     <label className="input-label">
-                                        {tradeSide.side === 'sell' ? (token1 as any)?.[1] : (token0 as any)?.[1]}</label>
+                                        {tradeSide.side === 'sell' ? token1?.symbol : token0?.symbol}</label>
                                 </div>
                             </Box>
                         </Box>
 
                         <div className="trade-route ">
-                            {tradeSide.side === 'sell' ? (token1 as any)?.[1] : (token0 as any)?.[1]}
+                            {tradeSide.side === 'sell' ? token1?.symbol : token0?.symbol}
                             <span className="green">{fmtNumCompact(tradeSide?.amount)}</span>
                             <DoubleArrow />
-                            {tradeSide.side === 'sell' ? (token0 as any)?.[1] : (token1 as any)?.[1]}
-                            {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : <span className="green">{fmtNumCompact(fmWei((outputs as any)?.[0], tradeSide.side === 'sell' ? (token0 as any)?.[2] : (token1 as any)?.[2]))}</span>}
+                            {tradeSide.side === 'sell' ? token0?.symbol : token1?.symbol}
+                            {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : <span className="green">{fmtNumCompact(routeOutput?.RoutOutputs)}</span>}
                         </div>
 
                         <div className="table-small">
                             <div className="table-small-inner">
                                 <span>FUTURE PRICE</span>
                                 <span>
-                                    {tradeSide.side === 'sell' ? (token1 as any)?.[1] : (token0 as any)?.[1]}
+                                    {tradeSide.side === 'sell' ? token1?.symbol : token0?.symbol}
                                     /
-                                    {tradeSide.side === 'sell' ? (token0 as any)?.[1] : (token1 as any)?.[1]}
+                                    {tradeSide.side === 'sell' ? token0?.symbol : token1?.symbol}
                                 </span>
                                 <span className='green'>
-                                    {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : fmtNumCompact(fmWei((outputs as any)?.[1], tradeSide.side === 'sell' ? (token0 as any)?.[2] : (token1 as any)?.[2]))}
+                                    {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : fmtNumCompact(routeOutput?.FuturePrice)}
                                 </span>
                             </div>
                             <div className="table-small-inner">
