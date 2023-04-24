@@ -1,7 +1,7 @@
 import { Box, Button, CircularProgress, Divider, Grid, Input, Radio, Switch } from "@mui/material";
 import Master from "../Layouts/Master";
 import { Web3Button } from "@web3modal/react";
-import { AccountBalance, ArrowDropDown, ArrowRight, Balance, DoubleArrow, Fullscreen, FullscreenExit, WalletOutlined } from "@mui/icons-material";
+import { ArrowDropDown, ArrowRight, DoubleArrow, Fullscreen, FullscreenExit } from "@mui/icons-material";
 import {
     useAccount, useContractRead,
     useContractReads,
@@ -10,8 +10,6 @@ import {
     useProvider,
     useToken,
     usePrepareContractWrite,
-    useSendTransaction,
-    usePrepareSendTransaction,
     useBalance
 } from "wagmi";
 import ContentModal from "../Components/Modal";
@@ -25,37 +23,37 @@ import { fmtNumCompact } from "../Helpers";
 import { toast } from 'react-toastify'
 
 export default function Snipper() {
-    const { isConnected, address, } = useAccount()
-    const Provider = useProvider()
-    const [sDxs, setSDxs] = useState(false)
+    const { isConnected, address, } = useAccount()  
     const { chain } = useNetwork()
-    const ADDR = useADDR(chain?.id);
-    const [q, setSearchParams] = useSearchParams({ dex: 'uniswap', });
-    const [baseBalance, setBasebalance] = useState<string | number>(0)
-    const [expandContainer, setExpnadContainer] = useState(true)
-    const [routeOutput, setRouteOutputs] = useState<any>()
-    const [tradeSide, setTradeSide] = useState({
-        side: 'buy',
-        amount: precise(Math.random() * 2)
+    const ADDR = useADDR(chain?.id);   
+    const ProviderInstance = useProvider()
+    const [showDexs, setShowDexs] = useState(false) 
+    const [searchParams, setSearchParams] = useSearchParams({ dex: 'uniswap' });
+    const [baseTokenBalance, setBaseTokenBalance] = useState<string | number>(0)
+    const [expandedContainer, setExpandedContainer] = useState(true)
+    const [routeOutputs, setRouteOutputs] = useState<any>()
+    const [selectedTrade, setSelectedTrade] = useState({
+        tradeType: 'buy',
+        tradeAmount: precise(Math.random() * 2)
     })
-    const [pairInfo, setPairInfo] = useState({
-        tnxCount: 0
+    const [selectedPair, setSelectedPair] = useState({
+        transactionCount: 0
+    })
+    const [priceInfo, setPriceInfo] = useState({
+        lastPrice: '0', currentPrice: '0', priceChange: '0'
     })
 
-    const [priceData, setPriceData] = useState({
-        last: '0', current: '0', change: '0'
-    })
 
     const [dataDisplayType, setDataDisplayType] = useState<'variants' | 'transactions' | 'pool'>('variants')
-    const dex = (ADDR?.DEXS as any)?.filter((d: any) => d?.NAME?.includes((q.get('dex') as any)?.toLowerCase()?.replace(/[^a-zA-Z]+/g, '')))[0]
+    const dex = (ADDR?.DEXS as any)?.filter((d: any) => d?.NAME?.includes((searchParams.get('dex') as any)?.toLowerCase()?.replace(/[^a-zA-Z]+/g, '')))[0]
     const handleNewDexSelected = (dexname: string) => {
-        setSDxs(false)
-        setSearchParams({ dex: dexname, pair: q.get('pair') as any })
+        setShowDexs(false)
+        setSearchParams({ dex: dexname, pair: searchParams.get('pair') as any })
     }
     const { data: Pairs } = useContractRead({
         abi: PRICE_ORACLE,
         address: ADDR['PRICE_ORACLEA'],
-        args: [q.get('pair')],
+        args: [searchParams.get('pair')],
         functionName: 'getTokensFromPair',
         watch: true
     })
@@ -64,8 +62,9 @@ export default function Snipper() {
     const { data: token1 } = useToken({ address: (Pairs as any)?.[1] })
     const { data: token0Balance } = useBalance({ address, token: token0?.address, watch: true })
     const { data: token1Balance } = useBalance({ address, token: token1?.address, watch: true })
-    const { data: token0InPool } = useBalance({ address: q.get('pair') as any, token: token0?.address, watch: true })
-    const { data: token1InPool } = useBalance({ address: q.get('pair') as any, token: token1?.address, watch: true })
+    const { data: token0InPool } = useBalance({ address: searchParams.get('pair') as any, token: token0?.address, watch: true })
+    const { data: token1InPool } = useBalance({ address: searchParams.get('pair') as any, token: token1?.address, watch: true })
+    
     const { data: currentPrice } = useContractRead({
         abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "priceInToken",
         args: [token0?.address, token1?.address, dex.ROUTER, dex.FACTORY],
@@ -77,37 +76,37 @@ export default function Snipper() {
             abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "getRouteOutputs",
             args: [
                 [dex.ROUTER],
-                (tradeSide.side === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
-                toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals)
+                (selectedTrade.tradeType === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
+                toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), (selectedTrade.tradeType === 'sell') ? token1?.decimals : token0?.decimals)
             ]
         }, {
             abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "predictFuturePrices",
             args: [
                 [dex.ROUTER],
-                (tradeSide.side === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
-                toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals)
+                (selectedTrade.tradeType === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
+                toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), (selectedTrade.tradeType === 'sell') ? token1?.decimals : token0?.decimals)
             ]
         }, {
             abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "priceImpacts",
             args: [
                 token1?.address, token0?.address,
                 [dex.FACTORY],
-                toWei(Number(Number.isNaN(tradeSide.amount) ? 0 : tradeSide.amount), (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals)
+                toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), (selectedTrade.tradeType === 'sell') ? token1?.decimals : token0?.decimals)
             ]
         }
-        ], watch: true, enabled: Boolean(!Number.isNaN(tradeSide.amount))
+        ], watch: true, enabled: Boolean(!Number.isNaN(selectedTrade.tradeAmount))
     })
 
     const { config, error } = usePrepareContractWrite({
         address: ADDR['PRICE_ORACLEA'], abi: PRICE_ORACLE, functionName: 'swap',
         overrides: {
             // customData: [token0?.address],
-            value: toWei(tradeSide.amount, (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals),
+            value: toWei(selectedTrade.tradeAmount, (selectedTrade.tradeType === 'sell') ? token1?.decimals : token0?.decimals),
         },
         args: [
-            (tradeSide.side === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
-            toWei(tradeSide?.amount, (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals),
-            toWei(routeOutput?.RoutOutputs, (tradeSide.side === 'sell') ? token1?.decimals : token0?.decimals),
+            (selectedTrade.tradeType === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
+            toWei(selectedTrade?.tradeAmount, (selectedTrade.tradeType === 'sell') ? token1?.decimals : token0?.decimals),
+            toWei(routeOutputs?.RoutOutputs, (selectedTrade.tradeType === 'sell') ? token1?.decimals : token0?.decimals),
             dex.ROUTER,
             120
         ],
@@ -119,8 +118,8 @@ export default function Snipper() {
     console.log(error, "PREPARE HAD ERROR")
 
     useEffect(() => {
-        const outPuts = fmWei((outputs as any)?.[0], tradeSide.side === 'sell' ? token0?.decimals : token1?.decimals)
-        const future = fmWei((outputs as any)?.[1], tradeSide.side === 'sell' ? token0?.decimals : token1?.decimals)
+        const outPuts = fmWei((outputs as any)?.[0], selectedTrade.tradeType === 'sell' ? token0?.decimals : token1?.decimals)
+        const future = fmWei((outputs as any)?.[1], selectedTrade.tradeType === 'sell' ? token0?.decimals : token1?.decimals)
         setRouteOutputs((o: any) => o = {
             ...o,
             RoutOutputs: outPuts,
@@ -145,34 +144,34 @@ export default function Snipper() {
         }
 
         (async () => {
-            const base = await Provider.getBalance(String(address))
-            setBasebalance(o => o = precise(fmWei(String(base))))
+            const base = await ProviderInstance.getBalance(String(address))
+            setBaseTokenBalance(o => o = precise(fmWei(String(base))))
         })();
 
         if (true) {
             (async () => {
-                const poolTnxCount = await Provider.getTransactionCount(q.get('pair') as any)
-                setPairInfo(p => p = {
+                const poolTnxCount = await ProviderInstance.getTransactionCount(searchParams.get('pair') as any)
+                setSelectedPair(p => p = {
                     ...p,
-                    tnxCount: Number(poolTnxCount)
+                    transactionCount: Number(poolTnxCount)
                 })
             })()
         }
 
-        setPriceData((p) => {
+        setPriceInfo((p) => {
             const _cp = Number(fmWei(currentPrice as any ?? 0, token1?.decimals))
-            const _op = Number(p.current)
+            const _op = Number(p.currentPrice)
             const __pd = _op - _cp
             const _pd = (__pd / _cp) * 100
             return {
                 ...p,
-                change: precise(_pd),
-                last: precise(_op, 16),
-                current: precise(_cp, 16)
+                priceChange: precise(_pd),
+                lastPrice: precise(_op, 16),
+                currentPrice: precise(_cp, 16)
             }
         })
 
-    }, [currentPrice, dataDisplayType, q, token1, hasSwapData, swapHasE, swapE])
+    }, [currentPrice, dataDisplayType, searchParams, token1, hasSwapData, swapHasE, swapE])
 
     const handleSwap = () => {
         transact?.()
@@ -180,17 +179,17 @@ export default function Snipper() {
 
     const DexSelector = <div className="space-between relative-container " style={{ zIndex: 20 }}>
         <Button
-            onClick={() => setSDxs(o => !o)}
+            onClick={() => setShowDexs(o => !o)}
             variant='contained'
             style={{ padding: '.2rem' }}
             className={`primary-button dark-button ${!dex?.NAME && 'error'}`}>
             <img src={dex?.ICON} alt={dex?.SYMBOL} className="icon" />&nbsp;{dex?.NAME ?? `Invalid DEX`}&nbsp;<ArrowDropDown />
         </Button>
-        <ContentModal shown={sDxs}>
+        <ContentModal shown={showDexs}>
             <div className="flexed-tabs">
                 {
                     (ADDR?.DEXS as any)?.map((dex: any) => {
-                        if (!(dex?.NAME?.includes((q.get('dex') as any)?.toLowerCase()?.replace(/[^a-zA-Z]+/g, '')))) {
+                        if (!(dex?.NAME?.includes((searchParams.get('dex') as any)?.toLowerCase()?.replace(/[^a-zA-Z]+/g, '')))) {
                             return <Button
                                 onClick={() => handleNewDexSelected(dex?.NAME)}
                                 variant='contained' style={{ padding: '.2rem' }}
@@ -212,15 +211,15 @@ export default function Snipper() {
                 <div className="table-small">
                     <div className="table-small-inner">
                         <span > LAST PRICE </span>
-                        <span>{priceData?.last}</span>
+                        <span>{priceInfo?.lastPrice}</span>
                         <span className="green">---</span>
                     </div>
                     <div className="table-small-inner">
                         <span >CURRENT PRICE</span>
-                        <span>{priceData?.current}</span>
+                        <span>{priceInfo?.currentPrice}</span>
                         <span className={`
-                        ${priceData?.change?.includes('-') ? 'orangered' : (priceData?.last === priceData?.current) ? '' : 'green'}`}
-                        >{priceData?.change}%</span>
+                        ${priceInfo?.priceChange?.includes('-') ? 'orangered' : (priceInfo?.lastPrice === priceInfo?.currentPrice) ? '' : 'green'}`}
+                        >{priceInfo?.priceChange}%</span>
                     </div>
                     <div className="table-small-inner">
                         <span >BUY PRICE</span>
@@ -273,7 +272,7 @@ export default function Snipper() {
                     <div className="table-small-inner">
                         <span> TOTAL TRANSACTIONS </span>
                         <span></span>
-                        <span>{pairInfo?.tnxCount}</span>
+                        <span>{selectedPair?.transactionCount}</span>
                     </div>
                     <div className="table-small-inner">
                         <span className="orangered">MORE DATA </span>
@@ -307,7 +306,7 @@ export default function Snipper() {
                 <h3 className="headline-3   space-between" style={{ marginTop: '1rem', marginBottom: 0 }}>
                     {token0?.symbol}/{token1?.symbol}
                     <div className="space-between" style={{ gap: 0 }}>
-                        <a target="_" className="green" href={`${chain?.blockExplorers?.default?.url}/address/${q.get('pair')}`}>&nbsp;{cut(q.get('pair'))}</a>
+                        <a target="_" className="green" href={`${chain?.blockExplorers?.default?.url}/address/${searchParams.get('pair')}`}>&nbsp;{cut(searchParams.get('pair'))}</a>
                         <ArrowRight />
                     </div>
                 </h3>
@@ -322,9 +321,9 @@ export default function Snipper() {
 
     return <Master>
         <Grid className="dash" style={{ borderRadius: 20 }}>
-            <Box className={`dash-lin-box relative-container expanable ${expandContainer ? 'expanded' : ''}`}>
+            <Box className={`dash-lin-box relative-container expanable ${expandedContainer ? 'expanded' : ''}`}>
                 <div className="contained">
-                    {/* <div className="expand-container" onClick={() => setExpnadContainer(e => !e)}>
+                    {/* <div className="expand-container" onClick={() => setExpandedContainer(e => !e)}>
                         <SwipeRightAlt />  
                     </div> */}
                     <div className="space-between" style={{ width: '100%', }}>
@@ -334,9 +333,9 @@ export default function Snipper() {
                         {DexSelector}
 
                         {
-                            expandContainer ?
-                                <FullscreenExit className="primary-button" onClick={() => setExpnadContainer(e => !e)} />
-                                : <Fullscreen className="primary-button" onClick={() => setExpnadContainer(e => !e)} />
+                            expandedContainer ?
+                                <FullscreenExit className="primary-button" onClick={() => setExpandedContainer(e => !e)} />
+                                : <Fullscreen className="primary-button" onClick={() => setExpandedContainer(e => !e)} />
                         }
 
                     </div>
@@ -345,9 +344,9 @@ export default function Snipper() {
                             <div className="filter-input-wrapper space-between" style={{ width: '100%' }}>
                                 <input className="input-reading"
                                     onChange={(e: any) => {
-                                        setSearchParams({ dex: q.get('dex') as any, pair: e.target.value })
+                                        setSearchParams({ dex: searchParams.get('dex') as any, pair: e.target.value })
                                     }}
-                                    value={(q.get('pair') as any) ?? ''}
+                                    value={(searchParams.get('pair') as any) ?? ''}
                                     placeholder='Pair Address... 0x0...' />
                                 <Button className="primary-button" >  PASTE  </Button>
                             </div>
@@ -358,73 +357,75 @@ export default function Snipper() {
                                     className="secondary-button"
                                     variant="contained"
                                     style={{ width: '100%' }}
-                                    onClick={() => setTradeSide(t => t = { ...t, side: 'buy' })}>
-                                    <Radio checked={tradeSide.side === 'buy'} />
+                                    onClick={() => setSelectedTrade(t => t = { ...t, tradeType: 'buy' })}>
+                                    <Radio checked={selectedTrade.tradeType === 'buy'} />
                                     {token0Balance?.symbol} {precise(token0Balance?.formatted ?? 0, 3)}
                                 </Button>
                                 <Button
                                     className="secondary-button"
                                     variant="contained"
                                     style={{ width: '100%' }}
-                                    onClick={() => setTradeSide(t => t = { ...t, side: 'sell' })}>
-                                    <Radio checked={tradeSide.side === 'sell'} />
+                                    onClick={() => setSelectedTrade(t => t = { ...t, tradeType: 'sell' })}>
+                                    <Radio checked={selectedTrade.tradeType === 'sell'} />
                                     {token1Balance?.symbol} {precise(token1Balance?.formatted ?? 0, 3)}
                                 </Button>
                             </div>
                             <Button className="" style={{ marginTop: '1rem' }}>
-                                {chain?.nativeCurrency?.symbol}&bull;{baseBalance}
+                                {chain?.nativeCurrency?.symbol}&bull;{baseTokenBalance}
                             </Button>
                             <Box className="alone-contianer " style={{ padding: '.4rem', marginTop: '.5rem' }}>
                                 <Divider />
                                 <div className="space-between" style={{ gap: 0 }}>
                                     <Input
                                         type="number"
-                                        value={tradeSide.amount}
+                                        value={selectedTrade.tradeAmount}
                                         maxRows={1}
                                         autoFocus
-                                        error={String(tradeSide.amount).length > 15 ? true : false}
+                                        error={String(selectedTrade.tradeAmount).length > 15 ? true : false}
                                         className="input-reading transparent-input"
-                                        onChange={(i: any) => setTradeSide(a => a = { ...a, amount: String(tradeSide.amount).length <= 15 && i.target.valueAsNumber })}
-                                        placeholder={`${tradeSide.side === 'sell' ? token1?.symbol : token0?.symbol} 0.00`}
+                                        onChange={(i: any) => setSelectedTrade(a => a = { ...a, tradeAmount: String(selectedTrade.tradeAmount).length <= 15 && i.target.valueAsNumber })}
+                                        placeholder={`${selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol} 0.00`}
                                     />
                                     <div className="space-between" style={{ gap: 0 }}>
                                         <Button>100%</Button>
                                         <Button>50%</Button>
                                     </div>
                                     <label className="input-label">
-                                        {tradeSide.side === 'sell' ? token1?.symbol : token0?.symbol}</label>
+                                        {selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol}</label>
                                 </div>
                             </Box>
                         </Box>
 
                         <div className="trade-route ">
-                            {tradeSide.side === 'sell' ? token1?.symbol : token0?.symbol}
-                            <span className="green">{fmtNumCompact(tradeSide?.amount)}</span>
+                            {selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol}
+                            <span className="green">{fmtNumCompact(selectedTrade?.tradeAmount)}</span>
                             <DoubleArrow />
-                            {tradeSide.side === 'sell' ? token0?.symbol : token1?.symbol}
-                            {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : <span className="green">{fmtNumCompact(routeOutput?.RoutOutputs)}</span>}
+                            {selectedTrade.tradeType === 'sell' ? token0?.symbol : token1?.symbol}
+                            {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : <span className="green">{fmtNumCompact(routeOutputs?.RoutOutputs)}</span>}
                         </div>
 
                         <div className="table-small">
+                            {
+                                !expandedContainer && (
+                                    <div className="table-small-inner">
+                                        <span >CURRENT PRICE</span>
+                                        <span>{priceInfo?.currentPrice}</span>
+                                        <span className={`${priceInfo?.priceChange?.includes('-') ? 'orangered' : (priceInfo?.lastPrice === priceInfo?.currentPrice) ? '' : 'green'}`} >{priceInfo?.priceChange}%</span>
+                                    </div>
+                                )
+                            }
                             <div className="table-small-inner">
                                 <span>FUTURE PRICE</span>
                                 <span>
-                                    {tradeSide.side === 'sell' ? token1?.symbol : token0?.symbol}
+                                    {selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol}
                                     /
-                                    {tradeSide.side === 'sell' ? token0?.symbol : token1?.symbol}
+                                    {selectedTrade.tradeType === 'sell' ? token0?.symbol : token1?.symbol}
                                 </span>
                                 <span className='green'>
-                                    {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : fmtNumCompact(routeOutput?.FuturePrice)}
+                                    {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : fmtNumCompact(routeOutputs?.FuturePrice)}
                                 </span>
                             </div>
-                            <div className="table-small-inner">
-                                <span className="orangered"> </span>
-                                <span> </span>
-                                <span >
-                                    {/* {precise((outputs as any)?.[2] ?? 0)}%  */}
-                                    {/* ---  */}
-                                </span>
-                            </div>
+
                         </div>
 
                         <Box className="input-area" >
@@ -448,7 +449,7 @@ export default function Snipper() {
                     </Box>
                 </div>
 
-                {expandContainer && ExTendedContainer}
+                {expandedContainer && ExTendedContainer}
             </Box>
         </Grid>
     </Master>
