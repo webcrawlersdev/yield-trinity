@@ -1,5 +1,0 @@
-GET https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?convert=BNB_USDT
-Content-Type: application/json
-X-CMC_PRO_API_KEY: 939c807e-df75-4d72-881a-b932831c4adc
-
-
