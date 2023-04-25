@@ -1,7 +1,7 @@
 import { Box, Button, CircularProgress, Divider, Grid, Input, Radio, Switch } from "@mui/material";
 import Master from "../../Layouts/Master";
 import { Web3Button } from "@web3modal/react";
-import { ArrowDropDown, ArrowRight, DoubleArrow, Fullscreen, FullscreenExit } from "@mui/icons-material";
+import { ArrowDropDown, ArrowRight, DoubleArrow, Fullscreen, FullscreenExit, Key } from "@mui/icons-material";
 import {
     useAccount, useContractRead,
     useContractReads,
@@ -29,7 +29,7 @@ export default function ManualSnipper() {
     const ADDR = useADDR(chain?.id);
     const ProviderInstance = useProvider()
     const [showDexs, setShowDexs] = useState(false)
-    const [searchParams, setSearchParams] = useSearchParams({ dex: 'uniswap' });
+    const [searchParams, setSearchParams] = useSearchParams({ dex: 'uniswap', pair: '' });
     const [baseTokenBalance, setBaseTokenBalance] = useState<string | number>(0)
     const [expandedContainer, setExpandedContainer] = useState(true)
     const [routeOutputs, setRouteOutputs] = useState<any>()
@@ -82,21 +82,21 @@ export default function ManualSnipper() {
             args: [
                 [dex.ROUTER],
                 (selectedTrade.tradeType === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
-                toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), (selectedTrade.tradeType === 'sell') ? token1?.decimals : token0?.decimals)
+                toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), selectedTrade?.tokenInfo?.decimals)
             ]
         }, {
             ...PriceOracleContracts, functionName: "predictFuturePrices",
             args: [
                 [dex.ROUTER],
                 (selectedTrade.tradeType === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
-                toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), (selectedTrade.tradeType === 'sell') ? token1?.decimals : token0?.decimals)
+                toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), selectedTrade?.tokenInfo?.decimals)
             ]
         }, {
             ...PriceOracleContracts, functionName: "priceImpacts",
             args: [
                 token1?.address, token0?.address,
                 [dex.FACTORY],
-                toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), (selectedTrade.tradeType === 'sell') ? token1?.decimals : token0?.decimals)
+                toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), selectedTrade?.tokenInfo?.decimals)
             ],
         }
         ], watch: true, enabled: Boolean(!Number.isNaN(selectedTrade.tradeAmount))
@@ -116,6 +116,7 @@ export default function ManualSnipper() {
         isLoading: isTransacting,
         isError: swapHasError,
         error: swapE,
+        reset: resetSwap
     } = useContractWrite({
         mode: 'recklesslyUnprepared',
         functionName: 'swap',
@@ -129,27 +130,16 @@ export default function ManualSnipper() {
             120
         ],
         overrides: {
-            gasLimit: 200000,
-            value: 0
+            value: toUpper(selectedTrade?.tokenInfo?.address) === toUpper(ADDR['WETH_ADDRESSA']) ? toWei(selectedTrade?.tradeAmount) : 0
         }
     })
 
-    // overrides: {
-    //     value: toUpper(selectedTrade?.tokenInfo?.address) === toUpper(ADDR['WETH_ADDRESSA']) ? toWei(selectedTrade?.tradeAmount, selectedTrade?.tokenInfo?.decimals) : 0,
-    //         gasLimit: 500000,
-    //     },
-
-
     const handleSwap = () => {
         if (toUpper(selectedTrade?.tokenInfo?.address) !== toUpper(ADDR['WETH_ADDRESSA']))
-            if (Number(fmWei(tokenAllowance as any)) <= 0) {
-                approve?.()
-                return
-            }
+            if (Number(fmWei(tokenAllowance as any)) <= 0)
+                return approve?.()
         swap?.()
     }
-
-    console.log(selectedTrade, "PREPARE HAD ERROR")
 
     useEffect(() => {
         const outPuts = fmWei((outputs as any)?.[0], selectedTrade?.tokenInfo?.decimals)
@@ -165,12 +155,13 @@ export default function ManualSnipper() {
     useEffect(() => {
         const TRANSACTING_TOAST_ID = 'TRANSACTING';
 
-        if (hasSwapData) {
+        if (hasSwapData && !swapHasError) {
             toast.promise(
                 hasSwapData.wait,
                 { error: 'error', success: 'Swap Successful', pending: 'Wait, Swapping...' },
                 { toastId: TRANSACTING_TOAST_ID }
             );
+            resetSwap()
         }
 
         if (swapHasError) {
@@ -178,6 +169,7 @@ export default function ManualSnipper() {
                 'Something went wrong\n\ncheck if: INSUFFICIENT_BALANCE\nREFLECTIONAL_TOKEN',
                 { toastId: TRANSACTING_TOAST_ID }
             );
+            resetSwap()
         }
 
         (async () => {
@@ -208,9 +200,10 @@ export default function ManualSnipper() {
         <ContentModal shown={showDexs}>
             <div className="flexed-tabs">
                 {
-                    (ADDR?.DEXS as any)?.map((dex: any) => {
+                    (ADDR?.DEXS as any)?.map((dex: any, index: any) => {
                         if (!(dex?.NAME?.includes((searchParams.get('dex') as any)?.toLowerCase()?.replace(/[^a-zA-Z]+/g, '')))) {
                             return <Button
+                                key={index + '-' + dex.NAME}
                                 onClick={() => handleNewDexSelected(dex?.NAME)}
                                 variant='contained' style={{ padding: '.2rem' }}
                                 className={`primary-button dark-button flexed-tab ${!dex?.NAME && 'error'}`}>
@@ -221,8 +214,8 @@ export default function ManualSnipper() {
                     })
                 }
             </div>
-        </ContentModal>
-    </div>
+        </ContentModal >
+    </div >
 
     const Variants = <motion.div initial={{ x: -100 }} animate={{ x: 0 }} className="info-container">
         <div className="only-two-flexed">
@@ -276,7 +269,7 @@ export default function ManualSnipper() {
                         <span>{token1InPool?.formatted}</span>
                     </div>
                     <div className="table-small-inner">
-                        <span className="orangered"> TOTAL VALUATION </span>
+                        <span className="orangered"> Watching... <CircularProgress dir='rtl' color="info" size={10} /></span>
                         <span></span>
                         <span>---</span>
                     </div>
@@ -390,9 +383,9 @@ export default function ManualSnipper() {
                             {chain?.nativeCurrency?.symbol}&bull;{baseTokenBalance}
                         </Button>
                         <Box className="alone-contianer " style={{ padding: '.4rem', marginTop: '.5rem' }}>
-                            <Divider />
-                            <div className="space-between" style={{ gap: 0 }}>
+                            <div className="space-between" style={{ gap: 0, paddingInline: '.6rem' }}>
                                 <Input
+                                    disableUnderline
                                     type="number"
                                     value={selectedTrade.tradeAmount}
                                     maxRows={1}
@@ -400,25 +393,20 @@ export default function ManualSnipper() {
                                     error={String(selectedTrade.tradeAmount).length > 15 ? true : false}
                                     className="input-reading transparent-input"
                                     onChange={(i: any) => setSelectedTrade((a: any) => a = { ...a, tradeAmount: String(selectedTrade.tradeAmount).length <= 15 && i.target.valueAsNumber })}
-                                    placeholder={`${selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol} 0.00`}
+                                    placeholder={`${selectedTrade.tokenInfo?.symbol} 0.00`}
                                 />
-                                <div className="space-between" style={{ gap: 0 }}>
-                                    <Button>100%</Button>
-                                    <Button>50%</Button>
-                                </div>
-                                <label className="input-label">
-                                    {selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol}</label>
+                                <label className="input-label">{selectedTrade.tokenInfo?.symbol}</label>
                             </div>
                         </Box>
                     </Box>
 
-                    <div className="trade-route ">
+                    <motion.div className="trade-route ">
                         {selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol}
                         <span className="green">{fmtNumCompact(selectedTrade?.tradeAmount)}</span>
                         <DoubleArrow />
                         {selectedTrade.tradeType === 'sell' ? token0?.symbol : token1?.symbol}
                         {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : <span className="green">{fmtNumCompact(routeOutputs?.RoutOutputs)}</span>}
-                    </div>
+                    </motion.div>
 
                     <div className="table-small">
                         {
@@ -430,7 +418,7 @@ export default function ManualSnipper() {
                                 </div>
                             )
                         }
-                        <div className="table-small-inner">
+                        <motion.div className="table-small-inner">
                             <span>FUTURE PRICE</span>
                             <span>
                                 {selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol}
@@ -440,7 +428,7 @@ export default function ManualSnipper() {
                             <span className='green'>
                                 {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : fmtNumCompact(routeOutputs?.FuturePrice)}
                             </span>
-                        </div>
+                        </motion.div>
 
                     </div>
 

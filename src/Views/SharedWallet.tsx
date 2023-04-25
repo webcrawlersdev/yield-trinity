@@ -190,7 +190,7 @@ export default () => {
                                 <div className="space-between">
                                     <input type="number" className="input-reading"
                                         onChange={(i: any) => setLockPeriod(o => (i.target.valueAsNumber >= 0) ? i.target.value : o)}
-                                        value={lockPeriod} placeholder={String((userDatas as any)?.[6] / 3600 + 'mins')} />
+                                        value={lockPeriod} placeholder={precise((userDatas as any)?.[6] / 3600)} />
                                     <Button children='hours' />
                                 </div>
                             </Box>

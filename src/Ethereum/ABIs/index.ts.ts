@@ -47,5 +47,5 @@ export const PRICE_ORACLE = [
     "function getTokensFromPair(address _pair)    public   view  returns(address token0, address token1)",
     "function getRouteOutputs(address[] calldata routes, address[] calldata path, uint256 amountIn ) public view returns (uint256[] memory outputs)",
     "function priceInToken(address _token0,   address _token1,  address _router,  address _factory ) public view returns(uint256 price)",
-    "function swap(address[] calldata _path, uint256 _amountIn, uint256 _minAmountOut, address _router, uint256 _deadline) public ",
+    "function swap(address[] calldata _path, uint256 _amountIn, uint256 _minAmountOut, address _router, uint256 _deadline) public payable ",
 ]
