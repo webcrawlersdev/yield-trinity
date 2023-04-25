@@ -25,7 +25,10 @@ export const PRICE_ORACLE = [
     "function decimals() public view returns (uint256)",
     "function name() public view returns (string memory)",
     "function symbol() public view returns (string memory)",
+    "function transfer(address _to, uint256 _value)",
     "function balanceOf(address account) external view returns (uint256)",
+    "function approve(address spender, uint256 amount) external returns (bool)",
+    "function allowance(address owner, address spender)  external  view   returns(uint256)",
     "function quotes(address _router, address _token1, address _token2, address _factory, uint256 _amount) external view returns(uint256 currentPrice)",
     "function quoteByPair(address _router, address _pair, uint256 _amount, address _factory) external view returns(uint256 currentQuote)",
     "function getPathForToken(address tokenIn, address tokenOut) external pure returns(address[] memory)",
@@ -44,5 +47,5 @@ export const PRICE_ORACLE = [
     "function getTokensFromPair(address _pair)    public   view  returns(address token0, address token1)",
     "function getRouteOutputs(address[] calldata routes, address[] calldata path, uint256 amountIn ) public view returns (uint256[] memory outputs)",
     "function priceInToken(address _token0,   address _token1,  address _router,  address _factory ) public view returns(uint256 price)",
-    "function swap(address[] calldata _path, uint256 _amountIn, uint256 _minAmountOut, address _router, uint256 _deadline) public payable"
+    "function swap(address[] calldata _path, uint256 _amountIn, uint256 _minAmountOut, address _router, uint256 _deadline) public ",
 ]

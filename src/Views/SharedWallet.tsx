@@ -5,7 +5,7 @@ import DoneIcon from '@mui/icons-material/DoneAllOutlined'
 import GasMeterIcon from '@mui/icons-material/GasMeterOutlined'
 import WalletIcon from '@mui/icons-material/WalletOutlined'
 import InfoIcon from '@mui/icons-material/InfoOutlined'
-import { useAccount, useNetwork, useContractWrite, useContractReads, useBalance, useProvider } from 'wagmi'
+import { useAccount, useNetwork, useContractWrite, useContractReads, useBalance, useProvider, useFeeData } from 'wagmi'
 import { Web3Button } from '@web3modal/react'
 import CancelIcon from '@mui/icons-material/CancelOutlined'
 import { useADDR } from "../Ethereum/Addresses"
@@ -29,7 +29,6 @@ export default () => {
 
     const [amount, setamount] = useState(0.5)
     const [tnxMode, settnxMode] = useState<'deposit' | 'withdraw'>('deposit')
-    const [gasPrice, setGasPrice] = useState('0.00')
     const { innerWidth } = useWindowDimensions()
     const provider = useProvider()
     const { isConnected, address, } = useAccount()
@@ -39,6 +38,7 @@ export default () => {
     const assets = useAssets('images')
 
     const userData: IcontractRead = { functionName: 'owner', abi: SABI, address: ADDR['SHARED_WALLET'] }
+    const { data: feeData } = useFeeData({ watch: true, formatUnits: 'gwei' })
     const { data: userDatas, isLoading: u_loading } = useContractReads({
         contracts: [
             { ...(userData as any) },
@@ -54,7 +54,6 @@ export default () => {
         , watch: true,
         cacheTime: 1000
     })
-
     const [lockPeriod, setLockPeriod] = useState(Number(Number(((userDatas as any)?.[6]) / 3600).toFixed(2)))
 
     const { data, isLoading: tnx_loading, isSuccess, error, isError, write } = useContractWrite({
@@ -67,7 +66,6 @@ export default () => {
     useEffect(() => {
         const toastId = "TNX_ID";
         (async () => await balance.refetch({ 'exact': true }))();
-        (async () => await provider.getGasPrice().then(i => setGasPrice(fmWei(i as any, 'gwei'))))();
 
         if (isError) {
             if ('data' in (error as any))
@@ -237,7 +235,7 @@ export default () => {
                             />}
                             <Chip
                                 className="chip"
-                                label={`Est. Gas Price ~ Gwei/${gasPrice}`}
+                                label={`Est. Gas Price ~ Gwei/${feeData?.formatted?.gasPrice}`}
                                 onClick={() => { }}
                                 onDelete={() => { }}
                                 deleteIcon={<GasMeterIcon />}

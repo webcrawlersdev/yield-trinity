@@ -39,3 +39,14 @@ export const cut = (val: string | number | unknown, position: "middle" | "left" 
             return valz.slice(0, 4) + '...'
     }
 }
+
+export const encodeFunctionCall = (funcName: string, abi: any, params: any): any => {
+    if (!Boolean(funcName) || !Boolean(abi) || !Boolean(params)) return '0x0'
+    let iface = new ethers.utils.Interface(abi);
+    const encodedData = iface.encodeFunctionData(funcName, params)
+    return encodedData
+}
+
+export const isAddress = (val: string) => ethers.utils.isAddress(String(val))
+export const toUpper = (val: string) => String(val?.toUpperCase())
+export const toLower = (val: string) => String(val?.toLowerCase())
