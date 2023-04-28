@@ -1,17 +1,21 @@
 import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import useMouseUpEvent from '../../Hooks/useMouseUpEvent'
 
-export default function ContentModal(props: { shown: boolean, children: React.ReactNode, }) {
-    const { shown, children } = props
+export default function ContentModal(props: { shown: boolean, children: React.ReactNode, onModalClose?: Function }) {
+    const { shown, children, onModalClose } = props
+    const containerRef = useRef<any>()
+    useMouseUpEvent(containerRef, onModalClose, containerRef)
 
     if (!shown) return <></>
 
-    return <motion.div
-        animate={{ top: '110%', opacity: 1 }}
-        initial={{ top: '0', opacity: 0 }}
-        exit={{ top: '0', opacity: 0 }}
-        className="content-modal-mail">
-        <div className="container">
+    return <div className="content-modal-mail">
+        <motion.div
+            animate={{ marginRight: 0, opacity: 1 }}
+            initial={{ marginRight: -200, opacity: 0 }}
+            exit={{ marginRight: 200, opacity: 0 }}
+            ref={containerRef} className="container">
             {children}
-        </div>
-    </motion.div>
+        </motion.div>
+    </div>
 }

@@ -1,5 +1,6 @@
 import { useNetwork } from "wagmi"
 import UniswapIcons from '../../Assets/image/Uniswap_Logo.svg.png'
+import PancakeSwapIcons from '../../Assets/image/pancakeswap-cake-logo.png'
 
 
 enum NETWORKS {
@@ -28,7 +29,7 @@ const ADDRESSES = {
             {
                 ROUTER: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
                 FACTORY: "0x6725f303b657a9451d8ba641348b6761a6cc7a17",
-                ICON: UniswapIcons,
+                ICON: PancakeSwapIcons,
                 NAME: 'pancakeswap',
                 SYMBOL: 'CAKE'
             },

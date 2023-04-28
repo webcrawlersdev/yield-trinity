@@ -18,19 +18,11 @@ export default function Heading() {
                     <Typography component={'h1'}>
                         <a className='site-name' href={window.location.href}>{innerWidth < 700 ? "YT" : window.location.pathname.replace('/', '').replace('-', ' ')}</a>
                     </Typography>
-                    <Web3NetworkSwitch />
-                    {/* <MenuToggle isOpen={isMenuOpen} handlemenuTooggle={handlemenuTooggle} />  */}
-                    {
-                        // innerWidth < 600 ? '' :
-                        //     <DropDown title={network.chain?.name}> 
-                        //         <Web3NetworkSwitch />
-                        //     </DropDown>
-                    }
+                    {innerWidth > 600 && <Web3NetworkSwitch />}
                 </div>
                 <Web3Button
-                    avatar={innerWidth < 700 ? 'hide' : 'show'}
-                    balance={innerWidth < 700 ? 'hide' : 'show'}
-
+                    avatar={'show'}
+                    balance={ 'show'}
                     icon='show' />
             </Box>
         </Box>

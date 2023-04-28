@@ -11,7 +11,7 @@ export default ({ children }: { children: React.ReactNode }) => {
             <MiniDrawer />
             <Box component="main" className="main-container"  >
                 <Heading />
-                <p className="path-description">New pairs listed on Ethereum exchanges with pool variation in real time</p>
+                <p className="path-description"></p>
                 <Box className='main-centered'>
                     {children}
                 </Box>

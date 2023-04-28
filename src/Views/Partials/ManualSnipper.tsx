@@ -1,7 +1,6 @@
-import { Box, Button, CircularProgress, Divider, Grid, Input, Radio, Switch } from "@mui/material";
-import Master from "../../Layouts/Master";
-import { Web3Button } from "@web3modal/react";
-import { ArrowDropDown, ArrowRight, DoubleArrow, Fullscreen, FullscreenExit, Key } from "@mui/icons-material";
+import { Box, Button, CircularProgress, Divider, FormControlLabel, Grid, Input, Radio, Switch } from "@mui/material";
+import { useWeb3Modal } from "@web3modal/react";
+import { ArrowDropDown, ArrowRight, DoubleArrow, Fullscreen, FullscreenExit, Key, SettingsApplications } from "@mui/icons-material";
 import {
     useAccount, useContractRead,
     useContractReads,
@@ -9,42 +8,38 @@ import {
     useProvider,
     useToken,
     useBalance,
-    usePrepareSendTransaction,
-    useSendTransaction,
-    useContractWrite
+    useContractWrite,
+    usePrepareContractWrite
 } from "wagmi";
-import ContentModal from "../../Components/Modal";
 import { useADDR } from "../../Ethereum/Addresses";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from 'react'
-import { cut, encodeFunctionCall, fmWei, precise, toBN, toLower, toUpper, toWei } from "../../Helpers";
+import { cut, fmWei, isAddress, precise, toBN, toUpper, toWei } from "../../Helpers";
 import { motion } from 'framer-motion'
 import { PRICE_ORACLE } from '../../Ethereum/ABIs/index.ts'
 import { fmtNumCompact } from "../../Helpers";
 import { toast } from 'react-toastify'
+import useDecentralizedExchange from "../../Hooks/useDecentralizedExchamge";
+import { ISnipperParams } from "../Snipper";
 
-export default function ManualSnipper() {
+export default function ManualSnipper(props: ISnipperParams) {
+    const { settings, setparams, dexes } = props
     const { isConnected, address, } = useAccount()
     const { chain } = useNetwork()
     const ADDR = useADDR(chain?.id);
     const ProviderInstance = useProvider()
-    const [showDexs, setShowDexs] = useState(false)
-    const [searchParams, setSearchParams] = useSearchParams({ dex: 'uniswap', pair: '' });
+    const [searchParams, setSearchParams] = useSearchParams({ dex: 'uniswap', pair: '', auto: 'false' });
     const [baseTokenBalance, setBaseTokenBalance] = useState<string | number>(0)
     const [expandedContainer, setExpandedContainer] = useState(true)
     const [routeOutputs, setRouteOutputs] = useState<any>()
     const [selectedPair, setSelectedPair] = useState({ transactionCount: 0 })
     const [priceInfo, setPriceInfo] = useState({ lastPrice: '0', currentPrice: '0', priceChange: '0' })
     const [dataDisplayType, setDataDisplayType] = useState<'variants' | 'transactions' | 'pool'>('variants')
-    const dex = (ADDR?.DEXS as any)?.filter((d: any) => d?.NAME?.includes(toLower(searchParams.get('dex') as any).replace(/[^a-zA-Z]+/g, '')))[0]
-    const pair = (searchParams.get('pair') as any).replace(' ', '')
+    const { dex } = useDecentralizedExchange(searchParams.get('dex'))
 
-    const handleNewDexSelected = (dexname: string) => {
-        setShowDexs(false)
-        setSearchParams({ dex: dexname, pair: searchParams.get('pair') as any })
-    }
-
-    const handlePairChange = (pair: string) => setSearchParams({ dex: searchParams.get('dex') as any, pair })
+    const pair = (searchParams.get('pair') as any)?.replace(' ', '')
+    const { open, isOpen } = useWeb3Modal()
+    const auto = (): boolean => new RegExp("true").test(searchParams.get('auto') as any)
 
     const { data: Pairs } = useContractRead({
         abi: PRICE_ORACLE,
@@ -66,7 +61,7 @@ export default function ManualSnipper() {
         abi: PRICE_ORACLE,
         functionName: 'allowance',
         args: [address, ADDR['PRICE_ORACLEA']],
-        watch: true
+        watch: true,
     })
     const PriceOracleContracts = {
         abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "priceInToken",
@@ -102,7 +97,16 @@ export default function ManualSnipper() {
         ], watch: true, enabled: Boolean(!Number.isNaN(selectedTrade.tradeAmount))
     })
 
-    const { write: approve } = useContractWrite({
+    const { data: lastPair } = useContractRead({
+        functionName: 'getLastPair',
+        abi: PRICE_ORACLE,
+        address: ADDR['PRICE_ORACLEA'],
+        watch: true,
+        args: [dex?.FACTORY],
+        enabled: auto(),
+    })
+
+    const { write: approve, data: approvalData, isLoading: isApproving } = useContractWrite({
         mode: 'recklesslyUnprepared',
         functionName: 'approve',
         abi: PRICE_ORACLE,
@@ -111,14 +115,7 @@ export default function ManualSnipper() {
         toWei(selectedTrade.tradeAmount, selectedTrade?.tokenInfo?.decimals)]
     })
 
-    const { write: swap,
-        data: hasSwapData,
-        isLoading: isTransacting,
-        isError: swapHasError,
-        error: swapE,
-        reset: resetSwap
-    } = useContractWrite({
-        mode: 'recklesslyUnprepared',
+    const { config, error: swapError, isError: isErrorPWRITE } = usePrepareContractWrite({
         functionName: 'swap',
         abi: PRICE_ORACLE,
         address: ADDR['PRICE_ORACLEA'],
@@ -130,14 +127,29 @@ export default function ManualSnipper() {
             120
         ],
         overrides: {
-            value: toUpper(selectedTrade?.tokenInfo?.address) === toUpper(ADDR['WETH_ADDRESSA']) ? toWei(selectedTrade?.tradeAmount) : 0
-        }
+            value: toUpper(selectedTrade?.tokenInfo?.address) === toUpper(ADDR['WETH_ADDRESSA']) ? toWei(selectedTrade?.tradeAmount) : 0,
+        },
     })
+
+    const { write: swap,
+        data: hasSwapData,
+        isLoading: isTransacting,
+        isError: swapHasError,
+        error: swapE,
+        reset: resetSwap
+    } = useContractWrite(config)
 
     const handleSwap = () => {
         if (toUpper(selectedTrade?.tokenInfo?.address) !== toUpper(ADDR['WETH_ADDRESSA']))
-            if (Number(fmWei(tokenAllowance as any)) <= 0)
-                return approve?.()
+            if (selectedTrade?.tokenInfo?.symbol !== chain?.nativeCurrency?.symbol)
+                if (Number(fmWei(tokenAllowance as any)) <= 0) {
+                    approve?.()
+                    toast.warn("Approval snipper to spend your ".concat(selectedTrade?.tokenInfo?.symbol).concat(' on your behalf'))
+                    swap?.()
+                    return
+                }
+
+        if (isErrorPWRITE) toast.error((swapError as any)?.reason, { toastId: "ERROR_TOAST" })
         swap?.()
     }
 
@@ -150,10 +162,14 @@ export default function ManualSnipper() {
             FuturePrice: future
         })
 
-    }, [outputs,])
+        if (auto() && isAddress(lastPair as string))
+            setparams('pair', lastPair as string)
+
+    }, [outputs, lastPair])
 
     useEffect(() => {
         const TRANSACTING_TOAST_ID = 'TRANSACTING';
+        const TRANSACTION_TOAST_ER = "ERROR"
 
         if (hasSwapData && !swapHasError) {
             toast.promise(
@@ -164,20 +180,14 @@ export default function ManualSnipper() {
             resetSwap()
         }
 
-        if (swapHasError) {
-            toast.error(
-                'Something went wrong\n\ncheck if: INSUFFICIENT_BALANCE\nREFLECTIONAL_TOKEN',
+        if (swapHasError || swapError) {
+            swapHasError && toast.error(
+                'Transaction Failed: '.concat((swapE as any)?.reason),
                 { toastId: TRANSACTING_TOAST_ID }
             );
+
             resetSwap()
         }
-
-        (async () => {
-            const baseBalance = await ProviderInstance.getBalance(String(address));
-            setBaseTokenBalance(o => o = precise(fmWei(String(baseBalance))));
-            const poolTnxCount = await ProviderInstance.getTransactionCount(searchParams.get('pair') as any);
-            setSelectedPair(p => ({ ...p, transactionCount: Number(poolTnxCount) }));
-        })();
 
         setPriceInfo((p) => {
             const currentPrice = Number(fmWei(tokenPriceInToken as any ?? 0, token1?.decimals));
@@ -187,35 +197,26 @@ export default function ManualSnipper() {
             return { ...p, currentPrice: precise(currentPrice, 16), lastPrice: precise(lastPrice, 16), priceChange };
         });
 
-    }, [tokenPriceInToken, dataDisplayType, searchParams, token1, hasSwapData, swapHasError, swapE]);
+        return () => {
+            (async () => {
+                const baseBalance = await ProviderInstance.getBalance(String(address));
+                setBaseTokenBalance(o => o = precise(fmWei(String(baseBalance))));
+                const poolTnxCount = await ProviderInstance.getTransactionCount(searchParams.get('pair') as any);
+                setSelectedPair(p => ({ ...p, transactionCount: Number(poolTnxCount) }));
+            })();
+        }
 
-    const DexSelector = <div className="space-between relative-container " style={{ zIndex: 20 }}>
+    }, [tokenPriceInToken, dataDisplayType, searchParams, token1, hasSwapData, swapHasError, swapE, swapError]);
+
+    const DexSelector = <div className="space-between isolated-container" style={{ zIndex: 20 }}>
         <Button
-            onClick={() => setShowDexs(o => !o)}
+            onClick={() => dexes(o => !o)}
             variant='contained'
             style={{ padding: '.2rem' }}
             className={`primary-button dark-button ${!dex?.NAME && 'error'}`}>
             <img src={dex?.ICON} alt={dex?.SYMBOL} className="icon" />&nbsp;{dex?.NAME ?? `Invalid DEX`}&nbsp;<ArrowDropDown />
         </Button>
-        <ContentModal shown={showDexs}>
-            <div className="flexed-tabs">
-                {
-                    (ADDR?.DEXS as any)?.map((dex: any, index: any) => {
-                        if (!(dex?.NAME?.includes((searchParams.get('dex') as any)?.toLowerCase()?.replace(/[^a-zA-Z]+/g, '')))) {
-                            return <Button
-                                key={index + '-' + dex.NAME}
-                                onClick={() => handleNewDexSelected(dex?.NAME)}
-                                variant='contained' style={{ padding: '.2rem' }}
-                                className={`primary-button dark-button flexed-tab ${!dex?.NAME && 'error'}`}>
-                                <img src={dex?.ICON} alt={dex?.SYMBOL} className="icon" />&nbsp;{dex?.NAME ?? `Invalid DEX`}
-                            </Button>
-                        }
-                        return <></>
-                    })
-                }
-            </div>
-        </ContentModal >
-    </div >
+    </div>
 
     const Variants = <motion.div initial={{ x: -100 }} animate={{ x: 0 }} className="info-container">
         <div className="only-two-flexed">
@@ -232,7 +233,7 @@ export default function ManualSnipper() {
                         <span>{priceInfo?.currentPrice}</span>
                         <span className={`
                         ${priceInfo?.priceChange?.includes('-') ? 'orangered' : (priceInfo?.lastPrice === priceInfo?.currentPrice) ? '' : 'green'}`}
-                        >{priceInfo?.priceChange}%</span>
+                        >{Number.isNaN(priceInfo?.priceChange) ? priceInfo?.priceChange : '0.00'}%</span>
                     </div>
                     <div className="table-small-inner">
                         <span >BUY PRICE</span>
@@ -319,7 +320,7 @@ export default function ManualSnipper() {
                 <h3 className="headline-3   space-between" style={{ marginTop: '1rem', marginBottom: 0 }}>
                     {token0?.symbol}/{token1?.symbol}
                     <div className="space-between" style={{ gap: 0 }}>
-                        <a target="_" className="green" href={`${chain?.blockExplorers?.default?.url}/address/${searchParams.get('pair')}`}>&nbsp;{cut(searchParams.get('pair'))}</a>
+                        <a target="_blank" className="green" href={`${chain?.blockExplorers?.default?.url}/address/${searchParams.get('pair')}`}>&nbsp;{cut(searchParams.get('pair'))}</a>
                         <ArrowRight />
                     </div>
                 </h3>
@@ -339,49 +340,57 @@ export default function ManualSnipper() {
                     </div> */}
                 <div className="space-between" style={{ width: '100%', }}>
                     <div className="space-between">
-                        Auto <Switch />
+                        <FormControlLabel control={<Switch onChange={() => setparams('auto', !auto())} checked={auto()} />} label="Auto" />
+                        <CircularProgress color="inherit" size={10} />
                     </div>
                     {DexSelector}
-
-                    {
+                    {/* {
                         expandedContainer ?
                             <FullscreenExit className="primary-button" onClick={() => setExpandedContainer(e => !e)} />
                             : <Fullscreen className="primary-button" onClick={() => setExpandedContainer(e => !e)} />
-                    }
+                    } */}
 
+                    <SettingsApplications className="primary-button" onClick={() => { typeof settings === 'function' && settings(o => !o) }} />
                 </div>
                 <Box className="box-input-area">
                     <Box className="input-area">
-                        <div className="filter-input-wrapper space-between" style={{ width: '100%' }}>
+                        <div className="filter-input-wrapper space-between" style={{ width: '100%', marginBlock: '1rem' }}>
                             <input className="input-reading"
-                                onChange={(e: any) => handlePairChange(e.target.value)}
+                                onChange={(e: any) => setparams('pair', e.target.value)}
+                                onFocus={() => setparams('auto', false)}
                                 value={(searchParams.get('pair') as any) ?? ''}
                                 placeholder='Pair Address... 0x0...' />
-                            <Button className="primary-button" >  PASTE  </Button>
                         </div>
 
-
-                        <div className="space-between" style={{ width: '100%', marginTop: '1rem', }}>
+                        <div className="toggle-slide-switch" style={{ width: '100%', marginTop: '1rem', }}>
                             <Button
-                                className="secondary-button"
+                                className="secondary-button active-side"
                                 variant="contained"
                                 style={{ width: '100%' }}
+                                disabled={selectedTrade.tradeType === 'buy'}
+                                onMouseDown={() => setparams('auto', false)}
                                 onClick={() => setSelectedTrade((t: any) => t = { ...t, tradeType: 'buy', tokenInfo: token0 })}>
                                 <Radio checked={selectedTrade.tradeType === 'buy'} />
                                 {token0Balance?.symbol} {precise(token0Balance?.formatted ?? 0, 3)}
                             </Button>
                             <Button
-                                className="secondary-button"
+                                className="secondary-button active-side"
                                 variant="contained"
                                 style={{ width: '100%' }}
+                                onMouseDown={() => setparams('auto', false)}
+                                disabled={selectedTrade.tradeType === 'sell'}
                                 onClick={() => setSelectedTrade((t: any) => t = { ...t, tradeType: 'sell', tokenInfo: token1 })}>
                                 <Radio checked={selectedTrade.tradeType === 'sell'} />
                                 {token1Balance?.symbol} {precise(token1Balance?.formatted ?? 0, 3)}
                             </Button>
                         </div>
+
                         <Button className="" style={{ marginTop: '1rem' }}>
-                            {chain?.nativeCurrency?.symbol}&bull;{baseTokenBalance}
+                            {baseTokenBalance !== 0 ? `${chain?.nativeCurrency?.symbol}${baseTokenBalance}`
+                                : <span className='danger-color '>connect your wallet</span>}
                         </Button>
+
+
                         <Box className="alone-contianer " style={{ padding: '.4rem', marginTop: '.5rem' }}>
                             <div className="space-between" style={{ gap: 0, paddingInline: '.6rem' }}>
                                 <Input
@@ -389,6 +398,7 @@ export default function ManualSnipper() {
                                     type="number"
                                     value={selectedTrade.tradeAmount}
                                     maxRows={1}
+                                    onFocus={() => setparams('auto', false)}
                                     autoFocus
                                     error={String(selectedTrade.tradeAmount).length > 15 ? true : false}
                                     className="input-reading transparent-input"
@@ -431,23 +441,21 @@ export default function ManualSnipper() {
                         </motion.div>
 
                     </div>
-
                     <Box className="input-area" >
                         {
                             isConnected ?
                                 <Button variant="contained"
                                     onClick={handleSwap}
-                                    className={`primary-button ${isTransacting && 'bg-red'}`} style={{ width: '100%' }}>
-                                    Transact{isTransacting && "ing..."}
+                                    className={`primary-button ${(isTransacting || isApproving) && 'bg-red'}`} style={{ width: ' 100%', marginTop: '1.4rem' }}>
+                                    Transact{(isTransacting || isApproving) && <span>ing&nbsp;<CircularProgress color="success" size={10} /></span>}
                                 </Button>
-                                : <div className="space-between">
-                                    <Web3Button label="Connect wallet first." />
-                                    <Button
-                                        className={`  `}
-                                        style={{ flexGrow: 1, borderRadius: 10, boxShadow: 'none' }} variant='contained' >
-                                        <a href="">What is this?</a>
-                                    </Button>
-                                </div>
+                                : <Button onClick={() => open()}
+                                    style={{ width: ' 100%', marginTop: '1.4rem' }}
+                                    variant="contained"
+                                    disabled={isOpen} className=" primary-button">
+                                    {isOpen ? "Connecting..." : "Connect Your Wallet"}
+                                </Button>
+
                         }
                     </Box>
                 </Box>

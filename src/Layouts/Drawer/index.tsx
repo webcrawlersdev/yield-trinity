@@ -65,7 +65,7 @@ export default function MiniDrawer() {
                             <ListItemButton sx={styles.lb}  >
                                 <Link to={`../${'snipper'}`} className='nav-link' >
                                     <RocketLaunch />
-                                    <ListItemText primary={"Token Snipper"} className="nav-name" />
+                                    <ListItemText primary={"Snipe Token"} className="nav-name" />
                                 </Link>
                             </ListItemButton>
                         </ListItem>

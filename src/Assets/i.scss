@@ -232,6 +232,10 @@
      isolation: isolate;
  }
 
+ .isolated-container {
+     isolation: isolate;
+ }
+
  .drop-down-wrapper {
      border-radius: 50px;
      position: relative;
@@ -322,6 +326,7 @@
      width: 400px;
      max-width: 100% !important;
      max-height: 100% !important;
+     flex-grow: 1;
      border-top-right-radius: inherit;
      border-bottom-right-radius: inherit;
      background: var(--body-background-color);
@@ -333,6 +338,48 @@
      height: 300px;
  }
 
+ .flex {
+     width: 100%;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     margin-top: 1.5rem;
+     background: var(--body-background-color);
+     border-radius: 50px;
+     overflow: hidden;
+
+     w3m-core-button {
+         border-radius: inherit !important;
+         overflow: hidden !important;
+     }
+ }
+
+ .toggle-slide-switch {
+     width: 100%;
+     border-radius: 50px;
+     overflow: hidden;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     background: var(--root-lgt-bg);
+     padding: .4rem;
+     box-shadow: 0 0 10px rgba(6, 148, 209, 0.05);
+
+     .active-side {
+         border-radius: 50px !important;
+         height: 45px !important;
+         transition: color 2100ms;
+
+         &:disabled {
+             background: transparent !important;
+             color: rgb(6, 148, 209);
+             text-shadow: 0 0 10px rgb(6, 148, 209);
+         }
+     }
+ }
+
+
+
  .expanable {
      display: flex;
      justify-content: space-between;
@@ -341,6 +388,7 @@
      max-width: 100% !important;
      max-height: min-content !important;
      padding: 0 !important;
+
 
      &:after {
          width: 0;
@@ -352,7 +400,7 @@
          transform: translate(-50%, -50%);
          left: 50%;
          top: 50%;
-         z-index: 100;
+         z-index: 50;
 
          &::before {
              width: 100%;
@@ -747,7 +795,7 @@
  }
 
  img.icon {
-     width: 27px;
+     width: 24px;
      aspect-ratio: 1/1;
      border-radius: 50px;
      padding: 1px;
@@ -1051,6 +1099,8 @@
 
  }
 
+
+
  .filter-input-wrapper {
      width: 350px;
      position: relative;
@@ -1097,25 +1147,53 @@
  }
 
  .content-modal-mail {
-     z-index: 2;
+     z-index: 51;
      display: flex;
      isolation: isolate;
-     width: max-content;
-     max-height: 56dvh;
-     position: absolute;
+     width: 100vw;
+     height: 100vh;
+     position: fixed;
      overflow: hidden;
      left: 0;
-     padding: .2rem;
-     top: 120%;
-     background: repeating-radial-gradient(circle at 0 0, var(--box-background-color), var(--body-background-color));
-     box-shadow: 0 0 1px inset rgb(0, 0, 0);
-     border-radius: 10px;
+     transform: translate(0, -50%);
+     top: 50%;
+     background: rgba(0, 0, 0, .1);
+     padding: 1rem;
 
      .container {
-         width: max-content;
-         max-height: 100%;
          overflow: auto;
-         overflow-x: hidden;
+         width: 300px;
+         max-width: 100%;
+         height: 100%;
+         background: linear-gradient(to top right, var(--box-background-color), var(--box-background-color));
+         margin-left: auto;
+         border-radius: 10px;
+     }
+ }
+
+ .modal-heading {
+     width: 100%;
+     padding-inline: 1rem;
+     background: transparent;
+     opacity: .5;
+     transition: background 1200ms;
+     padding-block: .6rem;
+
+     &:hover {
+         opacity: .7;
+         background: rgb(59, 11, 11);
+         cursor: pointer;
+     }
+
+     &:has(.close-btn:hover) {
+         opacity: 1 !important
+     }
+
+     .modal-headline {
+         font-size: 16px;
+         text-transform: uppercase;
+         margin: 0;
+         padding: 0;
      }
  }
 
@@ -1146,8 +1224,8 @@
          }
 
          img.icon {
-             width: 35px;
-             height: 35px;
+             width: 25px;
+             height: 25px;
              background: var(--box-background-color) !important;
          }
      }
@@ -1202,9 +1280,42 @@
      }
  }
 
+ .danger-color {
+     color: rgb(0, 72, 85);
+ }
+
+
+
  @media (max-width:600px) {
      .content-modal-mail {
          left: 0;
+     }
+
+     .expanded-container {
+         margin-top: 2rem;
+         height: max-content;
+         border-radius: 10px;
+         box-shadow: 0 0 2px rgba(255, 255, 255, 0.2) inset;
+     }
+
+     .expanable {
+         flex-wrap: wrap;
+         justify-content: center;
+         background: transparent;
+
+
+         &.expanded {
+             position: static;
+             transform: none;
+             left: auto;
+             z-index: 0;
+             top: auto;
+
+             &::before,
+             &::after {
+                 display: none;
+             }
+         }
      }
 
      .main-container {

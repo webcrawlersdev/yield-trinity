@@ -258,9 +258,9 @@ export default () => {
                                 <Web3Button label="Connect wallet first." />
                                 <Button
                                     className={`  ${tnxMode === 'withdraw' ? 'bg-red' : ''}`}
-                                    style={{ flexGrow: 1, borderRadius: 10, boxShadow: 'none' }} variant='contained'
+                                    style={{ flexGrow: 1, borderRadius: 10, boxShadow: 'none', height:'100%' }} variant='contained'
                                     onClick={handleDepOrWith}>
-                                    <a href="">Learn More</a>
+                                    Learn More
                                 </Button>
                             </div>
                     }
@@ -273,7 +273,7 @@ export default () => {
     const UserStatsGrig = (
         <Box className="dash-main-box box-stats">
             <Typography component='h2' className="ident">
-                Overview 🤚
+                Overview 🤚 {!isConnected && <span className="orangered">Connect your wallet</span>}
             </Typography>
             <Box className="box-input-area">
                 <Box className="stats-sections">
@@ -335,7 +335,7 @@ export default () => {
         <Master>
             {
                 !isConnected && <Typography component='p' style={{ padding: '1rem', textAlign: 'center', width: '100%' }}>
-                    Connect Your Wallet To View Stats
+
                 </Typography>
             }
             <Grid className="dash" style={{ borderRadius: 20 }}>
@@ -350,7 +350,7 @@ export default () => {
                         </div>
                     </Box>
                 }
-                {isConnected && UserStatsGrig}
+                {UserStatsGrig}
             </Grid>
         </Master>
     )
