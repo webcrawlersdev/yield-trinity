@@ -5,7 +5,7 @@ export default function useMouseUpEvent(ref: any, dosomehting: any, deps: any) {
         window.document.addEventListener('mouseup', (e: any) => {
             const menu = e.target
             if (ref?.current !== undefined)
-                if (menu !== ref.current && !(ref.current?.contains(menu)?.length)) {
+                if (menu !== ref.current && !(ref.current?.contains(menu))) {
                     typeof dosomehting === 'function' && dosomehting()
                 }
         })

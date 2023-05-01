@@ -32,10 +32,12 @@ export const cut = (val: string | number | unknown, position: "middle" | "left" 
     const valz = String(val)
     switch (position) {
         case "left":
+            if (valz.length <= 4) return valz
             return '...' + valz.slice(-4)
         case "middle":
             return valz.slice(0, 3) + '...' + valz.slice(-3)
         case "right":
+            if (valz.length <= 4) return valz
             return valz.slice(0, 4) + '...'
     }
 }
@@ -50,3 +52,22 @@ export const encodeFunctionCall = (funcName: string, abi: any, params: any): any
 export const isAddress = (val: string) => ethers.utils.isAddress(String(val))
 export const toUpper = (val: string) => String(val?.toUpperCase())
 export const toLower = (val: string) => String(val?.toLowerCase())
+export const priceDifference = (val: string | number, val2: string | number): { subtract: any, percentage: any } => {
+    const oldp = Number(val)
+    const newp = Number(val2)
+    const subtract = oldp - newp;
+    const addition = (oldp + newp) / 2
+    const division = subtract / addition
+    const percentage = (division * 100).toFixed(2)
+    return { subtract, percentage }
+}
+
+export const percentageof = (perc: number | string, num: number | string) => {
+    const percent = Number(perc) / 100
+    const final = Number(num) * percent
+    return final
+}
+
+export const wait = async (seconds?: number) => {
+    return new Promise((resolved) => setTimeout(() => resolved('continue'), seconds || 1000))
+}
