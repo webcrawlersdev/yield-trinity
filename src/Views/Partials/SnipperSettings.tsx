@@ -2,8 +2,9 @@ import { CancelPresentation } from "@mui/icons-material";
 import ContentModal from "../../Components/Modal";
 import { ISnipperParams } from "../Snipper";
 import { IParams, Params } from '../../Defaulds'
-import { Button, FormControlLabel, Input, Switch } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, Input, Switch } from "@mui/material";
 import { useLocalStorage } from "usehooks-ts";
+import { notify } from "../../Helpers";
 
 export interface ISwipperSettings {
     shown: boolean,
@@ -37,9 +38,9 @@ export default function SnipperSettings(props: ISwipperSettings) {
                 </p>
                 <div className="space-between">
                     <FormControlLabel control={<Switch
-                        onChange={() => setparams('takeProfit', !params.snipper.takeProfit)}
+                        onChange={() => setparams('takeProfit', !params.snipper.takeProfit) }
                         checked={params.snipper.takeProfit} />}
-                        label="TAKEPROFIT"
+                        label="TakeProfit"
                     /> <Input
                         type="number"
                         color='warning'
@@ -57,6 +58,28 @@ export default function SnipperSettings(props: ISwipperSettings) {
                         }}
                         placeholder={`%${params?.snipper?.takeProfitPercentage ?? 0}`}
                     />
+                </div>
+                <p className="paragraph small-text">
+                    Mode
+                </p>
+                <div className="space-between">
+                    <FormControlLabel control={<Checkbox
+                        onChange={() => setparams('mode', 'small')}
+                        checked={params?.snipper?.mode === 'small'} />}
+                        label="Small"
+                    />
+                    <FormControlLabel control={<Checkbox
+                        onChange={() => setparams('mode', 'mini')}
+                        checked={params?.snipper?.mode === 'mini'} />}
+                        label="Mini"
+                    />
+                    <FormControlLabel control={<Checkbox
+                        disabled
+                        onChange={() => setparams('mode', 'full')}
+                        checked={params?.snipper.mode === 'full'} />}
+                        label="Full"
+                    />
+
                 </div>
             </div>
             <Button

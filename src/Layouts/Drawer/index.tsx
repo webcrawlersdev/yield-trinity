@@ -10,7 +10,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import useWindowDimensions from '../../Hooks/useWindowDimensions';
-import { ExploreOutlined, Height, RocketLaunch, SnippetFolder } from '@mui/icons-material';
+import { ExploreOutlined, Height, RocketLaunch, SnippetFolder, StackedBarChart } from '@mui/icons-material';
 import { motion } from 'framer-motion'
 
 const drawerWidth = 200;
@@ -56,7 +56,7 @@ export default function MiniDrawer() {
                             <ListItemButton sx={styles.lb}  >
                                 <Link to={`../${'shared-wallet'}`} className='nav-link' >
                                     <AccountBalanceIcon />
-                                    <ListItemText primary={"Shared Wallet"} className="nav-name" />
+                                    <ListItemText primary={"Shared-Wallet"} className="nav-name" />
                                 </Link>
                             </ListItemButton>
                         </ListItem>
@@ -65,19 +65,19 @@ export default function MiniDrawer() {
                             <ListItemButton sx={styles.lb}  >
                                 <Link to={`../${'snipper'}`} className='nav-link' >
                                     <RocketLaunch />
-                                    <ListItemText primary={"Snipe Token"} className="nav-name" />
+                                    <ListItemText primary={"Snipe"} className="nav-name" />
                                 </Link>
                             </ListItemButton>
                         </ListItem>
 
-                        {/* <ListItem key={'explorer'} className="nav-li">
+                        <ListItem key={'arbitrade'} className="nav-li">
                             <ListItemButton sx={styles.lb}  >
-                                <Link to={`../${'explorer?page=pairs'}`} className='nav-link' >
-                                    <ExploreOutlined />
-                                    <ListItemText className="nav-name" primary={"New pairs"} />
+                                <Link to={`../${'arbitrade'}`} className='nav-link' >
+                                    <StackedBarChart />
+                                    <ListItemText className="nav-name" primary={"Arbitrade"} />
                                 </Link>
                             </ListItemButton>
-                        </ListItem> */}
+                        </ListItem>
                     </List>
 
                     <List className='nav-ul'>

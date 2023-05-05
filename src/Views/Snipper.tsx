@@ -40,6 +40,7 @@ export default function Snipper() {
         />
         <DexChanges
             shown={showDexes}
+            selected={params?.snipper?.dex}
             onSelect={handleNewDexSelected}
             toggle={setShowDexes}
         />

@@ -5,19 +5,18 @@ import { IParams, Params } from '../../Defaulds'
 import { useNetwork } from "wagmi";
 import { useADDR } from "../../Ethereum/Addresses";
 import { Button } from "@mui/material";
-import { useLocalStorage } from "usehooks-ts";
 
 export interface ISwipperSettings {
     shown: boolean,
+    selected: any,
     toggle: ISnipperParams['settings'],
     onSelect(dexname: string): void
 }
 
 export default function DexChanges(props: ISwipperSettings) {
-    const { shown, toggle, onSelect } = props
+    const { shown, toggle, onSelect, selected } = props
     const { chain } = useNetwork()
     const ADDR = useADDR(chain?.id);
-    const [params, storeParams] = useLocalStorage<IParams>('@Params', Params)
 
     return (
         <ContentModal shown={shown} onModalClose={() => toggle(s => false)}>
@@ -27,16 +26,18 @@ export default function DexChanges(props: ISwipperSettings) {
             <div className="flexed-tabs">
                 {
                     (ADDR?.DEXS as any)?.map((dex: any, index: any) => {
-                        if (!(dex?.NAME?.includes(params?.snipper?.dex))) {
-                            return <Button
-                                key={index + '-' + dex.NAME}
-                                onClick={() => onSelect(dex?.NAME)}
-                                variant='contained' style={{ padding: '.2rem' }}
-                                className={`primary-button dark-button flexed-tab ${!dex?.NAME && 'error'}`}>
-                                <img src={dex?.ICON} alt={dex?.SYMBOL} className="icon" />&nbsp;{dex?.NAME ?? `Invalid DEX`}
-                            </Button>
-                        }
-                        return <></>
+                        return <Button
+                            key={index + '-' + dex.NAME}
+                            onClick={() => onSelect(dex?.NAME)}
+                            disabled={(dex?.NAME?.includes(selected))}
+                            style={{ padding: '.2rem', opacity: (dex?.NAME?.includes(selected)) ? 0.2 : 1, color: 'white' }}
+                            className={`flexed-tab capitalize ${!dex?.NAME && 'error'}`}>
+                            <img src={dex?.ICON} alt={dex?.SYMBOL} className="icon" />
+                            <div className="flex-col" style={{ paddingLeft: '.5rem' }}>
+                                <span>{dex?.SYMBOL}</span>
+                                <span className="small-text">{dex?.NAME ?? `Invalid DEX`}</span>
+                            </div>
+                        </Button>
                     })
                 }
             </div>

@@ -1,7 +1,7 @@
 export interface IParams {
     snipper: {
         keys: 'autoFetchLastPair' | 'dex' | 'pair' | 'pair' | 'mode' | 'dataDisplay' | 'inPosition' | 'takeProfit'
-        | 'lasBuyPrice' | 'lastSellPrice' | 'lastBuyTime' | 'takeProfitPercentage'
+        | 'lasBuyPrice' | 'lastSellPrice' | 'lastBuyTime' | 'takeProfitPercentage' | 'pushNotificationEnabled'
         autoFetchLastPair: boolean
         pair: any
         dex: string
@@ -14,6 +14,11 @@ export interface IParams {
         lasBuyPrice: number
         lastSellPrice: number
         lastBuyTime: number
+        pushNotificationEnabled: boolean
+    }
+    arbitrade: {
+        keys: 'dexes',
+        dexes?: object | []
     }
 }
 
@@ -31,6 +36,11 @@ export const Params: IParams = {
         lasBuyPrice: 0,
         lastSellPrice: 0,
         lastBuyTime: 0,
-        takeProfitPercentage: 10
+        takeProfitPercentage: 10,
+        pushNotificationEnabled: false
+    },
+    arbitrade: {
+        keys: 'dexes',
+        dexes: []
     }
 }

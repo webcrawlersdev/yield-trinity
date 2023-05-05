@@ -1,6 +1,7 @@
 import { useNetwork } from "wagmi"
 import UniswapIcons from '../../Assets/image/Uniswap_Logo.svg.png'
 import PancakeSwapIcons from '../../Assets/image/pancakeswap-cake-logo.png'
+import { tokensList } from "../TokensList";
 
 
 enum NETWORKS {
@@ -18,6 +19,7 @@ const ADDRESSES = {
         SHARED_WALLET: "0xE66B70549FDc0278877E91D007E33d5b6A32b682",
         PRICE_ORACLEA: "0xbEd5197e4C6Fb8e62cc75Ee3e77F7Ba880cf6b33",
         WETH_ADDRESSA: "0xae13d989dac2f0debff460ac112a837c89baa7cd",
+        TOKENS: tokensList[97],
         DEXS: [
             {
                 ROUTER: "",
@@ -38,7 +40,7 @@ const ADDRESSES = {
 }
 
 
-export const useADDR = (chainID: number | undefined) => {
+export const useADDR = (chainID?: number | undefined) => {
     const { chain } = useNetwork()
     return (ADDRESSES as any)?.[AVAILABLE_CHAINS[chainID as number]] ?? (ADDRESSES as any)?.[(chain as any)?.id] ?? ADDRESSES[97]
 }

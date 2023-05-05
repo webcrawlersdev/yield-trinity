@@ -13,7 +13,7 @@ import {
 } from "wagmi";
 import { useADDR } from "../../Ethereum/Addresses";
 import { useEffect, useState } from 'react'
-import { cut, fmWei, isAddress, percentageof, precise, priceDifference, toBN, toUpper, toWei } from "../../Helpers";
+import { cut, fmWei, isAddress, percentageof, precise, priceDifference, strEqual, sub, toBN, toUpper, toWei } from "../../Helpers";
 import { motion } from 'framer-motion'
 import { PRICE_ORACLE } from '../../Ethereum/ABIs/index.ts'
 import { fmtNumCompact } from "../../Helpers";
@@ -190,11 +190,10 @@ export default function ManualSnipper(props: ISnipperParams) {
         }
 
         if (hasSwapData) {
-            console.log(params?.snipper);
             (async () => {
                 setButtonText('working...')
                 await hasSwapData?.wait().then(async () => {
-                    if (selectedTrade?.tradeType === 'buy') {
+                    if (!params?.snipper?.inPosition) {
                         setparams('lastSellPrice', 0)
                         await wait(200)
                         setparams('inPosition', true)
@@ -288,7 +287,7 @@ export default function ManualSnipper(props: ISnipperParams) {
                     <div className="table-small-inner" style={{ opacity: params?.snipper?.takeProfit ? 1 : .2 }}>
                         <span>SELLING PRICE</span>
                         <span>
-                            {percentageof(params?.snipper?.takeProfitPercentage+100, params?.snipper?.lasBuyPrice)}
+                            {percentageof(params?.snipper?.takeProfitPercentage + 100, params?.snipper?.lasBuyPrice)}
                         </span>
                         <span >
                             {params?.snipper?.takeProfitPercentage}
@@ -296,7 +295,7 @@ export default function ManualSnipper(props: ISnipperParams) {
                     </div>
                     <div className="table-small-inner">
                         <span>POT. PROFIT (now)</span>
-                        <span>{precise(Number(fmWei(tokenPriceInToken as any, token1?.decimals)) - params?.snipper?.lasBuyPrice)}</span>
+                        <span>{sub(fmWei(tokenPriceInToken as any, token1?.decimals), params?.snipper?.lasBuyPrice)}</span>
                         <span>
                             {
                                 priceDifference(
@@ -432,10 +431,19 @@ export default function ManualSnipper(props: ISnipperParams) {
                             </Button>
                         </div>
 
-                        <Button className="" style={{ marginTop: '1rem' }}>
-                            {baseTokenBalance !== 0 ? `${chain?.nativeCurrency?.symbol}${baseTokenBalance}`
-                                : <span className='danger-color '>connect your wallet</span>}
-                        </Button>
+                        <div className="space-between" style={{ marginTop: '1rem' }}>
+                            <Button >
+                                {baseTokenBalance !== 0 ? `${chain?.nativeCurrency?.symbol}${baseTokenBalance}`
+                                    : <span className='danger-color '>connect your wallet</span>}
+                            </Button>
+
+                            <FormControlLabel
+                                control={
+                                    <Switch />
+                                }
+                                label="Serial Trade"
+                            />
+                        </div>
 
 
                         <Box className="alone-contianer " style={{ padding: '.4rem', marginTop: '.5rem' }}>

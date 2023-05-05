@@ -9,7 +9,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
 import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import useWindowDimensions from '../../Hooks/useWindowDimensions';
-import { ExploreOutlined, MenuOpenRounded, RocketLaunch } from '@mui/icons-material';
+import { ExploreOutlined, MenuOpenRounded, RocketLaunch, StackedBarChart } from '@mui/icons-material';
 import useMouseUpEvent from '../../Hooks/useMouseUpEvent';
 
 export default function FixedNavBar() {
@@ -58,10 +58,19 @@ export default function FixedNavBar() {
                         <ListItemText primary={"Shared Wallet"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>
                 </ListItemButton>
+
+                <ListItemButton sx={styles.lb}  >
+                    <Link to={`../arbitrade`} style={styles.lbl}>
+                        <StackedBarChart />
+                        <ListItemText primary={"Arbitrade"} sx={{ opacity: open ? 1 : 0 }} />
+                    </Link>
+                </ListItemButton>
+
+
                 <ListItemButton sx={styles.lb}  >
                     <Link to={`../${'snipper'}`} style={styles.lbl}>
                         <RocketLaunch />
-                        <ListItemText primary={"Snipe Token (the->early->access)"} sx={{ opacity: open ? 1 : 0 }} />
+                        <ListItemText primary={"Snipe"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>
                 </ListItemButton>
 
@@ -71,6 +80,7 @@ export default function FixedNavBar() {
                         <ListItemText primary={"Community"} sx={{ opacity: open ? 1 : 0 }} />
                     </Link>
                 </ListItemButton>
+
 
                 <ListItemButton sx={styles.lb}  >
                     <Link to={`../${'info'}`} style={styles.lbl}>

@@ -9,6 +9,7 @@ import Dashboard from './Views/Dashoard';
 import Explorer from './Views/Explorer';
 import Info from './Views/Info';
 import Snipper from './Views/Snipper';
+import Arbitrage from './Views/Arbitrage';
 
 function App() {
   useAssets()
@@ -23,6 +24,7 @@ function App() {
           <Route path='explorer' element={<Explorer />} />
           <Route path='snipper' element={<Snipper />} />
           <Route path='info' element={<Info />} />
+          <Route path='arbitrade' element={<Arbitrage />} />
           <Route path='*' element={<E404Page />} />
         </Routes>
       </BR>
