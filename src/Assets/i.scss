@@ -44,8 +44,6 @@
      cursor: grab;
  }
 
-
-
  .site-name {
      font-size: 23px;
      text-transform: capitalize;
@@ -284,6 +282,216 @@
      justify-content: center;
      gap: .7rem;
      text-transform: uppercase;
+ }
+
+ .tokens-path-is {
+     display: flex;
+    //  background: var(--body-background-color);
+     gap: -.2rem;
+     margin-inline: .5rem;
+     align-items: center;
+    //  border-radius:   10px;
+    //  padding: .2rem .5rem;
+    // //  box-shadow: 0 0 1.6px whitesmoke inset;
+
+     .token-icon-wrap {
+         border-radius: 50px;
+         padding: .06rem;
+         background: var(--body-background-color);
+         z-index: 1;
+
+         .token-icon{
+            width: 20px;
+            aspect-ratio: 1/1;
+         }
+
+     }
+ }
+
+ .trade-routes {
+     width: 100%;
+     height: 500px;
+     overflow: hidden;
+
+     .trade-path {
+         width: 100%;
+         display: block;
+         margin-block: 1.4rem;
+
+         .trade-paths {
+             width: 100%;
+             border-radius: 10px;
+             position: relative;
+             isolation: isolate;
+
+
+
+             .trade-path-ind {
+                 box-shadow: 0 0 1px inset rgba(255, 255, 255, 0.3);
+                 background: var(--box-background-color);
+                 display: flex;
+                 flex-direction: column;
+                 padding: .6rem;
+                 border-radius: 5px;
+                 min-width: 130px;
+                 justify-content: center;
+                 cursor: pointer;
+                 transition: background 800ms;
+
+                 &:hover {
+                     background: black;
+                 }
+
+                 hr {
+                     width: 100%;
+                     border-radius: 50px;
+                     opacity: .1;
+                 }
+
+                 .trade-amount,
+                 .token-info {
+                     font-size: 12px;
+                     font-weight: 400;
+                     text-transform: uppercase;
+                     font-family: var(--font-family-sans-serif);
+                 }
+             }
+
+             &::after {
+                 width: 100%;
+                 border-color: transparent;
+                 border-top: solid 5px var(--box-background-color);
+                 border-style: dotted;
+                 content: '';
+                 position: absolute;
+                 left: 0;
+                 transform: translate(0, -50%);
+                 top: 50%;
+                 z-index: -1;
+             }
+
+             &::before {
+                 border-color: transparent;
+                 border-color: transparent;
+                 border-top: solid 5px white;
+                 border-style: dotted;
+                 content: '';
+                 width: 10px;
+                 border-radius: 50px;
+                 position: absolute;
+                 left: 0;
+                 transform: translate(0, -50%);
+                 top: 50%;
+                 z-index: -1;
+                 animation: left-to-right infinite linear 2s;
+             }
+         }
+
+         .dex-name {
+             padding: .4rem .8rem;
+             background: var(--box-background-color);
+             width: max-content;
+             margin-bottom: .5rem;
+             border-radius: 80px;
+             position: relative;
+             box-shadow: 0 0 1px inset rgba(255, 255, 255, 0.3);
+             font-size: 11px;
+             text-transform: uppercase;
+             font-weight: 200;
+             font-family: var(--font-family-monospace);
+             cursor: pointer;
+
+             &::after {
+                 position: absolute;
+                 right: -30px;
+                 width: 70px;
+                 height: 40px;
+                 border-color: transparent;
+                 border-top: solid 3px var(--box-background-color);
+                 border-right: solid 3px var(--box-background-color);
+                 border-style: dashed;
+                 top: 46%;
+                 content: '';
+                 z-index: -1;
+                 border-top-right-radius: 20px;
+             }
+         }
+
+         &:nth-of-type(2n) {
+
+             .trade-paths {
+                 &::before {
+                     animation: reverse left-to-right infinite linear 4s !important;
+                 }
+             }
+
+             .dex-name {
+                 margin-left: auto;
+                 direction: rtl;
+
+                 &::before {
+                     transform: translate(-50%, 0);
+                     content: '';
+                     position: absolute;
+                     left: 50%;
+                     border-color: transparent;
+                     border-left: solid 5px var(--box-background-color);
+                     border-style: dotted;
+                     top: -50px;
+                     height: 70px;
+                     z-index: -1;
+                 }
+
+                 &::after {
+                     right: auto;
+                     left: -30px;
+                     border-color: transparent;
+                     border-top: solid 3px var(--box-background-color);
+                     border-left: solid 3px var(--box-background-color);
+                     border-style: dashed;
+                     border-top-left-radius: 20px;
+                 }
+
+             }
+         }
+
+         &:nth-of-type(3n) {
+             .trade-paths {
+                 &::before {
+                     animation: left-to-right infinite linear 8s !important;
+                 }
+             }
+
+             .dex-name {
+
+                 &::before {
+                     transform: translate(-50%, 0);
+                     content: '';
+                     position: absolute;
+                     left: 50%;
+                     border-color: transparent;
+                     border-left: solid 5px var(--box-background-color);
+                     border-style: dotted;
+                     top: -50px;
+                     height: 70px;
+                     z-index: -1;
+                 }
+
+             }
+         }
+     }
+ }
+
+ @keyframes left-to-right {
+     to {
+         left: 100%
+     }
+ }
+
+ @-webkit-keyframes left-to-right {
+     to {
+         right: 100%
+     }
  }
 
  .expand-container {

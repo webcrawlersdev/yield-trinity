@@ -17,7 +17,8 @@ export interface IParams {
         pushNotificationEnabled: boolean
     }
     arbitrade: {
-        keys: 'dexes',
+        keys: 'dexes' | 'currentDexId'
+        currentDexId: number
         dexes?: object | []
     }
 }
@@ -41,6 +42,7 @@ export const Params: IParams = {
     },
     arbitrade: {
         keys: 'dexes',
+        currentDexId: 0,
         dexes: []
     }
 }
