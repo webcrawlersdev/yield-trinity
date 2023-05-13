@@ -1,6 +1,6 @@
 import useAssets from './Assets';
 import Web3Modal from './Ethereum/Web3Modal';
-import { BrowserRouter as BR, Routes, Route } from 'react-router-dom'
+import { HashRouter as HR, Routes, Route } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import E404Page from './Views/E404Page';
@@ -15,7 +15,7 @@ function App() {
   useAssets()
   return (
     <Web3Modal>
-      <BR>
+      <HR>
         <ToastContainer position='bottom-right' draggable theme='dark' toastStyle={{ boxShadow: '0 0 1px rgba(255,255,255,0.6) inset', borderRadius: 6, overflow: 'hidden' }} />
         <Routes>
           <Route path='' element={<Dashboard />} />
@@ -27,7 +27,7 @@ function App() {
           <Route path='arbitrade' element={<Arbitrage />} />
           <Route path='*' element={<E404Page />} />
         </Routes>
-      </BR>
+      </HR>
     </Web3Modal>
   );
 }

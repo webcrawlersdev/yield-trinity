@@ -60,8 +60,6 @@ export default function ArbitradeRouteBuilder(props: IArbitradeRouteBuilder) {
                             return <></>
                         })
                     }</div>
-
-
                     <ArrowForward />
                 </Button>
             </Box>

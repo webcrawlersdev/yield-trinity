@@ -6,9 +6,10 @@ import DexChanges from "./Partials/DexChanges";
 import useDecentralizedExchange from "../Hooks/useDecentralizedExchamge";
 import { ArrowDropDown, Route } from "@mui/icons-material";
 import { useLocalStorage } from "usehooks-ts";
-import { IParams, Params } from "../Defaulds";
+import { IDex, IParams, ITokenInfo, Params } from "../Defaulds";
 import ArbitradeRouteBuilder from "./Partials/ArbitradeRouteBuilder";
 import { TokensList } from "./Partials/Tokens";
+import { wait } from "../Helpers";
 
 export interface IArbitrade {
     setparams(key: IParams['arbitrade']['keys'], val: any): void
@@ -31,23 +32,35 @@ export default function Arbitrage() {
         setParams('dexes', [...(params?.arbitrade?.dexes as any), dex])
     }
 
-    const handleRemoveDex = (dexId: any) => {
+    const handleRemoveDex = async (dexId: any) => {
         const selected = (params?.arbitrade?.dexes as any)
         const dex = selected?.filter((i: any, index: any) => index !== dexId)
         setParams('dexes', dex)
     }
 
-    const appendTokenForPath = (token: any, dexId: number) => {
+    const appendTokenForPath = (token: ITokenInfo, dexId: number, isChecked: boolean) => {
         const selected = (params?.arbitrade?.dexes as any)
-        const dex = selected?.filter((i: any, index: any) => index === dexId)
-        const avpaths = [...(dex?.paths ?? [] as any)]?.filter(t => t?.symbol !== token?.symbol);
-        avpaths.push(token)
-        const modified = selected.map((dex: any, i: number) => {
-            (dex as any)['paths'] = (i === dexId) ? avpaths : (dex as any)['paths']
+        const modifiedDex = selected?.map((dex: IDex, index: number) => {
+
+            let paths = dex['paths'] || []
+
+            if ((index === dexId)) {
+                paths = paths?.filter((tInPath: ITokenInfo) => tInPath?.symbol !== token?.symbol) as [ITokenInfo];
+                isChecked || paths?.push(token)
+                if (paths?.length <= 4)
+                    dex['paths'] = paths
+            }
+
+            if (index > 0 && Boolean(selected?.[index - 1]?.paths?.length)) {
+                const firtSibling0 = selected?.[index - 1]?.paths?.[selected?.[index - 1]?.paths?.length - 1]
+                const pathLine = paths?.filter((tInPath: ITokenInfo) => firtSibling0?.symbol !== tInPath?.symbol);
+                pathLine.unshift(firtSibling0);
+                dex['paths'] = pathLine as [ITokenInfo]
+            }
+
             return dex
         })
-        console.log(selected, modified)
-        setParams('dexes', modified)
+        setParams('dexes', modifiedDex)
     }
 
     const RouteBuilder = (
@@ -94,27 +107,33 @@ export default function Arbitrage() {
                 </h3>
                 <span></span>
             </div>
-
-
+            <br />
             <div className="trade-routes">
                 {
                     (params?.arbitrade?.dexes as any)?.map((dex: any) => {
-                        return <div className="trade-path">
-                            <div className="dex-name">{dex?.NAME}</div>
-                            <div className="trade-paths space-between">
-                                {
-                                    (dex?.paths as any)?.map((path: any) => {
-                                        return (
-                                            <div className="trade-path-ind">
-                                                <span className="trade-amount">356</span>
-                                                <hr />
-                                                <span className="token-info">{path?.symbol}</span>
-                                            </div>
-                                        )
-                                    })
-                                }
+                        if (dex?.paths?.length > 1)
+                            return <div className="trade-path">
+                                <div className="dex-name">{dex?.NAME}</div>
+                                <div className="trade-paths space-between">
+                                    {
+                                        (dex?.paths as any)?.map((path: any) => {
+                                            return (
+                                                <div className="trade-path-ind">
+                                                    <span className="trade-amount">356</span>
+                                                    <hr />
+                                                    <div className="space-between" style={{ width: 'max-content', gap: '.3rem' }}>
+                                                        <div className="token-icon-wrap">
+                                                            <img src={path?.logoURI} alt={path?.symbol} className="token-icon" />
+                                                        </div>
+                                                        <span className="token-info">{path?.symbol}</span>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
                             </div>
-                        </div>
+                        return <span>SELECT PATH</span>
                     })
                 }
             </div>

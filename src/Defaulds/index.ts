@@ -1,3 +1,23 @@
+
+
+
+export interface ITokenInfo {
+    logoURI: string
+    address: string
+    name: string
+    symbol: string
+    decimals: number
+}
+
+export interface IDex {
+    ROUTER: string
+    FACTORY: string
+    ICON: string
+    NAME: string
+    SYMBOL: string
+    paths: [ITokenInfo]
+}
+
 export interface IParams {
     snipper: {
         keys: 'autoFetchLastPair' | 'dex' | 'pair' | 'pair' | 'mode' | 'dataDisplay' | 'inPosition' | 'takeProfit'
@@ -16,10 +36,11 @@ export interface IParams {
         lastBuyTime: number
         pushNotificationEnabled: boolean
     }
+
     arbitrade: {
         keys: 'dexes' | 'currentDexId'
         currentDexId: number
-        dexes?: object | []
+        dexes?: [IDex]
     }
 }
 
@@ -43,6 +64,6 @@ export const Params: IParams = {
     arbitrade: {
         keys: 'dexes',
         currentDexId: 0,
-        dexes: []
+        // dexes: []
     }
 }
