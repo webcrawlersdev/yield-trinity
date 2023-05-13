@@ -1,5 +1,8 @@
+import { SHARED_WALLET as SABI } from "../Ethereum/ABIs/index.ts"
 
-
+export interface IArbitrade {
+    setparams(key: IParams['arbitrade']['keys'], val: any): void
+}
 
 export interface ITokenInfo {
     logoURI: string
@@ -16,6 +19,7 @@ export interface IDex {
     NAME: string
     SYMBOL: string
     paths: [ITokenInfo]
+    output: any
 }
 
 export interface IParams {
@@ -38,8 +42,9 @@ export interface IParams {
     }
 
     arbitrade: {
-        keys: 'dexes' | 'currentDexId'
+        keys: 'dexes' | 'currentDexId' | 'amountIn'
         currentDexId: number
+        amountIn: number
         dexes?: [IDex]
     }
 }
@@ -64,6 +69,14 @@ export const Params: IParams = {
     arbitrade: {
         keys: 'dexes',
         currentDexId: 0,
-        // dexes: []
+        amountIn: 1,
+        dexes: [] as any
     }
+}
+
+export interface IContractRead {
+    functionName: string,
+    abi: typeof SABI,
+    address: string | any
+    args?: any
 }

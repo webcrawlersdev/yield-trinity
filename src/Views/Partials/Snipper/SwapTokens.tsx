@@ -1,11 +1,9 @@
 import { Box, Button } from '@mui/material/'
 import { useNetwork } from 'wagmi'
-import useWindowDimensions from '../../Hooks/useWindowDimensions'
 
 export default () => {
 
     const { chain } = useNetwork()
-    const { innerWidth } = useWindowDimensions()
 
     return (
         <Box className="dash-main-box flexed-dash box-stats" >
@@ -15,7 +13,7 @@ export default () => {
                         <p className='centered-text'>New listings on {chain?.name} exchanges</p>
                     </li>
 
-                    
+
                 </ul>
             </div>
         </Box>

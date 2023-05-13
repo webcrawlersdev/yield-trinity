@@ -1,10 +1,10 @@
 import { CancelPresentation } from "@mui/icons-material";
-import ContentModal from "../../Components/Modal";
-import { ISnipperParams } from "../Snipper";
-import { IParams, Params } from '../../Defaulds'
+import ContentModal from "../../../Components/Modal";
+import { ISnipperParams } from "../../Snipper";
+import { IParams, Params } from '../../../Defaulds'
 import { Button, Checkbox, FormControlLabel, Input, Switch } from "@mui/material";
 import { useLocalStorage } from "usehooks-ts";
-import { notify } from "../../Helpers";
+import { notify } from "../../../Helpers";
 
 export interface ISwipperSettings {
     shown: boolean,
@@ -38,7 +38,7 @@ export default function SnipperSettings(props: ISwipperSettings) {
                 </p>
                 <div className="space-between">
                     <FormControlLabel control={<Switch
-                        onChange={() => setparams('takeProfit', !params.snipper.takeProfit) }
+                        onChange={() => setparams('takeProfit', !params.snipper.takeProfit)}
                         checked={params.snipper.takeProfit} />}
                         label="TakeProfit"
                     /> <Input

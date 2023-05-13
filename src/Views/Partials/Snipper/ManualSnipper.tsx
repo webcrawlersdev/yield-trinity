@@ -11,17 +11,17 @@ import {
     useContractWrite,
     usePrepareContractWrite
 } from "wagmi";
-import { useADDR } from "../../Ethereum/Addresses";
+import { useADDR } from "../../../Ethereum/Addresses";
 import { useEffect, useState } from 'react'
-import { cut, fmWei, isAddress, percentageof, precise, priceDifference, strEqual, sub, toBN, toUpper, toWei } from "../../Helpers";
+import { cut, fmWei, isAddress, percentageof, precise, priceDifference, strEqual, sub, toBN, toUpper, toWei } from "../../../Helpers";
 import { motion } from 'framer-motion'
-import { PRICE_ORACLE } from '../../Ethereum/ABIs/index.ts'
-import { fmtNumCompact } from "../../Helpers";
+import { PRICE_ORACLE } from '../../../Ethereum/ABIs/index.ts'
+import { fmtNumCompact } from "../../../Helpers";
 import { toast } from 'react-toastify'
-import useDecentralizedExchange from "../../Hooks/useDecentralizedExchamge";
-import { ISnipperParams } from "../Snipper";
+import useDecentralizedExchange from "../../../Hooks/useDecentralizedExchamge";
+import { ISnipperParams } from "../../Snipper";
 import { useLocalStorage } from "usehooks-ts";
-import { Params } from "../../Defaulds";
+import { Params } from "../../../Defaulds";
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { wait } from "@testing-library/user-event/dist/utils";
@@ -95,7 +95,8 @@ export default function ManualSnipper(props: ISnipperParams) {
                 toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), selectedTrade?.tokenInfo?.decimals)
             ],
         }
-        ], watch: true, enabled: Boolean(!Number.isNaN(selectedTrade.tradeAmount))
+        ], watch: true, enabled: Boolean(!Number.isNaN(selectedTrade.tradeAmount)),
+        cacheTime: 0
     })
 
     const { data: lastPair } = useContractRead({
@@ -105,6 +106,7 @@ export default function ManualSnipper(props: ISnipperParams) {
         watch: true,
         args: [dex?.FACTORY],
         enabled: auto(),
+        cacheTime: 0
     })
 
     const { write: approve, data: approvalData, isLoading: isApproving } = useContractWrite({
@@ -113,7 +115,7 @@ export default function ManualSnipper(props: ISnipperParams) {
         abi: PRICE_ORACLE,
         address: selectedTrade?.tokenInfo?.address,
         args: [ADDR['PRICE_ORACLEA'],
-        toWei(selectedTrade.tradeAmount, selectedTrade?.tokenInfo?.decimals)]
+            toWei(selectedTrade.tradeAmount, selectedTrade?.tokenInfo?.decimals)] 
     })
 
     const { config, error: swapError, isError: isErrorPWRITE } = usePrepareContractWrite({
@@ -130,6 +132,7 @@ export default function ManualSnipper(props: ISnipperParams) {
         overrides: {
             value: toUpper(selectedTrade?.tokenInfo?.address) === toUpper(ADDR['WETH_ADDRESSA']) ? toWei(selectedTrade?.tradeAmount) : 0,
         },
+        cacheTime: 0
     })
 
     const { write: swap,

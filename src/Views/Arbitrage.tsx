@@ -4,20 +4,17 @@ import { useNetwork } from "wagmi";
 import { useState } from "react";
 import DexChanges from "./Partials/DexChanges";
 import useDecentralizedExchange from "../Hooks/useDecentralizedExchamge";
-import { ArrowDropDown, Route } from "@mui/icons-material";
+import { Route } from "@mui/icons-material";
 import { useLocalStorage } from "usehooks-ts";
 import { IDex, IParams, ITokenInfo, Params } from "../Defaulds";
-import ArbitradeRouteBuilder from "./Partials/ArbitradeRouteBuilder";
+import ArbitradeRouteBuilder from "./Partials/Arbitrade/RouteBuilder";
 import { TokensList } from "./Partials/Tokens";
-import { wait } from "../Helpers";
+import ArbitrageRoutePath from "./Partials/Arbitrade/RoutePath";
+import Summary from "./Partials/Arbitrade/Summary";
 
-export interface IArbitrade {
-    setparams(key: IParams['arbitrade']['keys'], val: any): void
-}
 
 export default function Arbitrage() {
     const { chain } = useNetwork()
-    const [amount, setamount] = useState()
     const [showDexes, setShowDexes] = useState(false)
     const [showTokens, setShowTokens] = useState(false)
     const { dexs } = useDecentralizedExchange()
@@ -28,13 +25,28 @@ export default function Arbitrage() {
 
     const handleNewDexSelected = (dexname: string) => {
         setShowDexes(false)
+        const selected = params?.arbitrade?.dexes || []
         const dex = dexs?.filter((d: any) => d?.NAME === dexname)[0]
-        setParams('dexes', [...(params?.arbitrade?.dexes as any), dex])
+        if (Number(params?.arbitrade?.dexes?.length) >= 3)
+            selected[Number(params?.arbitrade?.dexes?.length) - 1] = dex as IDex
+        else
+            selected[Number(params?.arbitrade?.dexes?.length)] = dex
+        setParams('dexes', selected)
     }
 
     const handleRemoveDex = async (dexId: any) => {
-        const selected = (params?.arbitrade?.dexes as any)
-        const dex = selected?.filter((i: any, index: any) => index !== dexId)
+        const selected = params?.arbitrade?.dexes
+        const dex = selected?.filter((dexIt, index: any) => {
+            let paths = dexIt['paths'] || []
+            if (index === dexId) { return }
+            if (index > 0 && Boolean(selected?.[index - 1]?.paths?.length)) {
+                const firtSibling0 = selected?.[index - 1]?.paths?.[selected?.[index - 1]?.paths?.length - 1]
+                const pathLine = paths?.filter((tInPath: ITokenInfo) => firtSibling0?.symbol !== tInPath?.symbol);
+                pathLine.unshift(firtSibling0);
+                dexIt['paths'] = pathLine as [ITokenInfo]
+            }
+            return dexIt
+        })
         setParams('dexes', dex)
     }
 
@@ -70,12 +82,12 @@ export default function Arbitrage() {
                     <Input
                         disableUnderline
                         type="number"
-                        value={amount}
+                        value={params?.arbitrade?.amountIn}
                         maxRows={1}
                         autoFocus
-                        error={String(amount).length > 15 ? true : false}
+                        error={String(params?.arbitrade?.amountIn).length > 15 ? true : false}
                         className="input-reading transparent-input"
-                        onChange={(i: any) => setamount(o => (i.target.valueAsNumber >= 0) ? i.target.value : o)}
+                        onChange={({ target: { value } }) => setParams('amountIn', Number(value))}
                         placeholder={'Amount In 0.001'}
                     />
                     <Button
@@ -84,7 +96,7 @@ export default function Arbitrage() {
                             setShowTokens(s => !s)
                         }}
                         style={{ paddingRight: 0 }}>
-                        BNB&nbsp;<ArrowDropDown />
+                        {params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol}
                     </Button>
                 </div>
             </Box>
@@ -110,43 +122,25 @@ export default function Arbitrage() {
             <br />
             <div className="trade-routes">
                 {
-                    (params?.arbitrade?.dexes as any)?.map((dex: any) => {
+                    params?.arbitrade?.dexes?.map((dex, index: number) => {
                         if (dex?.paths?.length > 1)
-                            return <div className="trade-path">
-                                <div className="dex-name">{dex?.NAME}</div>
-                                <div className="trade-paths space-between">
-                                    {
-                                        (dex?.paths as any)?.map((path: any) => {
-                                            return (
-                                                <div className="trade-path-ind">
-                                                    <span className="trade-amount">356</span>
-                                                    <hr />
-                                                    <div className="space-between" style={{ width: 'max-content', gap: '.3rem' }}>
-                                                        <div className="token-icon-wrap">
-                                                            <img src={path?.logoURI} alt={path?.symbol} className="token-icon" />
-                                                        </div>
-                                                        <span className="token-info">{path?.symbol}</span>
-                                                    </div>
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                </div>
-                            </div>
-                        return <span>SELECT PATH</span>
+                            return <ArbitrageRoutePath dexId={index} dex={dex} />
+                        return <span key={Math.random()}></span>
                     })
                 }
             </div>
+            <Summary />
         </Box>
     )
 
     return <Master>
-        <Grid className="dash " style={{ borderRadius: 20, maxHeight: '100%' }}>
+        <Grid className="dash relative" style={{ borderRadius: 5, maxHeight: '100%' }}>
             <Box className="dash-lin-box sticky-top transparent padding-none">
                 {RouteBuilder}
                 {
-                    (params?.arbitrade?.dexes as any)?.map((a: any, index: any) => {
+                    params?.arbitrade?.dexes?.map((a: any, index: any) => {
                         return <ArbitradeRouteBuilder
+                            key={"ROUTE_BUILDER-" + Math.random()}
                             setParams={(key: any, val: any) => setParams(key, val)}
                             amount={100}
                             dex={a}
@@ -159,8 +153,6 @@ export default function Arbitrage() {
             </Box>
             {TradeRoute}
         </Grid>
-
-
         {/* MODALS */}
         <DexChanges
             selected={null}
@@ -174,5 +166,6 @@ export default function Arbitrage() {
             selected={'NODE'}
             onSelect={appendTokenForPath}
         />
+        
     </Master>
 }

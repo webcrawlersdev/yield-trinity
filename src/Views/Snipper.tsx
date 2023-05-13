@@ -1,9 +1,9 @@
 import Master from "../Layouts/Master";
-import ManualSnipper from "./Partials/ManualSnipper";
+import ManualSnipper from "./Partials/Snipper/ManualSnipper";
 import { useState } from 'react'
 import { useLocalStorage } from "usehooks-ts";
 import { Params, IParams } from "../Defaulds";
-import SnipperSettings from "./Partials/SnipperSettings";
+import SnipperSettings from "./Partials/Snipper/SnipperSettings";
 import DexChanges from "./Partials/DexChanges";
 
 export interface ISnipperParams {

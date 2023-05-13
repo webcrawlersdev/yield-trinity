@@ -7,7 +7,6 @@ import { motion } from 'framer-motion'
 
 export default function Heading() {
 
-    const network = useNetwork()
     const { innerWidth } = useWindowDimensions()
 
     return (

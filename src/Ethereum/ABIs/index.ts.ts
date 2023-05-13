@@ -10,7 +10,7 @@ export const SHARED_WALLET = [
     "function owner () public view returns (address)",
     "function withdrawalFee () public view returns (uint256)",
     "function dilutedEarning(address user) view returns (uint256)",
-    "function potentialEarn(address user) view returns (uint256)", 
+    "function potentialEarn(address user) view returns (uint256)",
     "function getTokenPairReserves(address pairAddress) public  view returns (uint256 token0Reserve, uint256 reserve1Reserve)",
     "function getTokenFromPair( address pair  ) public view returns (address tokenAddress, bool isValid)",
     "function getTokenPriceInWETH( address _token  ) public view returns (uint256 priceInWETH)",
@@ -42,6 +42,14 @@ export const PRICE_ORACLE = [
     "function tokensLiquidity(  address _token1,  address _token2, address _factory  ) public view returns(uint256 base, uint256 token)",
     "function getTokenFromPair(address _pair) public  view  returns(address tokenAddress, bool isValid)",
     // "function getTokenInfo(address _token) public  view returns(TokenInfo memory)",
+    `function multiPathSwap(
+        address[] calldata _paths,
+        uint256[] calldata _pathIndex,
+        address[] calldata  _routes,
+        uint256[] calldata  _inputes,
+        uint256[] calldata _minOutputs,
+        uint256 _deadline 
+    ) public payable`,
     "function priceImpacts( address _token0, address _token1, address[] memory _fatories, uint256 amount) public view returns(uint256[] memory impacts)",
     "function getTokenPairReserves(address _pair, address _factory) public  view returns(uint256 token0Reserve, uint256 reserve1Reserve)",
     "function getTokensFromPair(address _pair)    public   view  returns(address token0, address token1)",

@@ -10,13 +10,12 @@ export default ({ children }: { children: React.ReactNode }) => {
             <MiniDrawer />
             <Box component="main" className="main-container"  >
                 <Heading />
-                {/* <Box className="main-content"> */}
-                <p className="path-description"></p>
-                <Box className='main-centered'>
-                    {children}
+                <Box className="main-content">
+                    <Box className='main-centered'>
+                        {children}
+                    </Box>
+                    <Footing />
                 </Box>
-                <Footing />
-                {/* </Box> */}
                 <FixedNavBar />
             </Box>
         </div>

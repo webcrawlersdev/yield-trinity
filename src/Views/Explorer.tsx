@@ -2,14 +2,14 @@ import Master from "../Layouts/Master"
 import { Link, useSearchParams } from 'react-router-dom'
 import ExploreNewPairs from "./Partials/ExploreNewPairs";
 import { Grid, } from '@mui/material/'
-import SwapTokens from "./Partials/SwapTokens";
+import SwapTokens from "./Partials/Snipper/SwapTokens";
 
 
 
 
 export default () => {
 
-    const [searchParams, setSearchParams] = useSearchParams({ page: 'pairs'});
+    const [searchParams, setSearchParams] = useSearchParams({ page: 'pairs' });
 
     return (
         <Master>

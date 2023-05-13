@@ -17,13 +17,10 @@ import useWindowDimensions from "../Hooks/useWindowDimensions"
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Timelapse } from "@mui/icons-material"
+import { IContractRead } from "../Defaulds"
 dayjs.extend(relativeTime)
 
-interface IcontractRead {
-    functionName: string,
-    abi: typeof SABI,
-    address: string
-}
+
 
 export default () => {
 
@@ -37,7 +34,7 @@ export default () => {
     const ADDR = useADDR(chain?.id)
     const assets = useAssets('images')
 
-    const userData: IcontractRead = { functionName: 'owner', abi: SABI, address: ADDR['SHARED_WALLET'] }
+    const userData: IContractRead = { functionName: 'owner', abi: SABI, address: ADDR['SHARED_WALLET'] }
     const { data: feeData } = useFeeData({ watch: true, formatUnits: 'gwei' })
     const { data: userDatas, isLoading: u_loading } = useContractReads({
         contracts: [
@@ -52,7 +49,7 @@ export default () => {
             { ...(userData as any), functionName: 'potentialEarn', args: [address] },
         ]
         , watch: true,
-        cacheTime: 1000
+        cacheTime: 100
     })
     const [lockPeriod, setLockPeriod] = useState(Number(Number(((userDatas as any)?.[6]) / 3600).toFixed(2)))
 
@@ -60,7 +57,7 @@ export default () => {
         mode: 'recklesslyUnprepared',
         address: ADDR['SHARED_WALLET'] as any, abi: SABI, functionName: tnxMode,
         overrides: tnxMode === 'deposit' ? { value: toWei(amount) } : {},
-        args: tnxMode === 'withdraw' ? [toWei(amount)] : [(lockPeriod * 3600).toFixed()]
+        args: tnxMode === 'withdraw' ? [toWei(amount)] : [(lockPeriod * 3600).toFixed()] 
     })
 
     useEffect(() => {

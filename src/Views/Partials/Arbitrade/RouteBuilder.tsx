@@ -1,9 +1,8 @@
 import { ArrowForward, Close } from "@mui/icons-material";
 import { Box, Button } from "@mui/material";
 import { motion } from 'framer-motion'
-import { IArbitrade } from "../Arbitrage";
 import { useLocalStorage } from "usehooks-ts";
-import { Params, IParams } from "../../Defaulds";
+import { Params, IParams, IArbitrade } from "../../../Defaulds";
 
 export interface IArbitradeRouteBuilder {
     amount: number,
@@ -14,10 +13,9 @@ export interface IArbitradeRouteBuilder {
     setParams: IArbitrade['setparams']
 }
 
-
 export default function ArbitradeRouteBuilder(props: IArbitradeRouteBuilder) {
 
-    const { dex, amount, onRemove, dexId, onShowTokens, setParams } = props
+    const { dex, amount, onRemove, dexId,  onShowTokens, setParams } = props
     const [params, storeParams] = useLocalStorage<IParams>('@Params', Params)
 
 
@@ -45,19 +43,17 @@ export default function ArbitradeRouteBuilder(props: IArbitradeRouteBuilder) {
                         setParams('currentDexId', dexId)
                     }}
                     className=" primary-button dark-button padding-none arb-button-selector">
-                    SELECT TRADE PATH&nbsp;
+                    {params?.arbitrade?.dexes?.[dexId]?.paths?.length ? 'PATH' : 'SELECT TRADE PATH'}&nbsp;
 
                     <div className="tokens-path-is">{
                         (params?.arbitrade?.dexes as any)?.map((dex: any, index: number) => {
                             if (index === dexId)
-                                return dex?.paths?.map((path: any) => {
-                                    return (
-                                        <div className="token-icon-wrap">
-                                            <img src={path?.logoURI} alt={path?.symbol} className="token-icon" />
-                                        </div>
-                                    )
-                                })
-                            return <></>
+                                return dex?.paths?.map((path: any) =>
+                                    <div className="token-icon-wrap" key={"ROUTE_PATH-" + Math.random()}>
+                                        <img src={path?.logoURI} alt={path?.symbol} className="token-icon" />
+                                    </div>
+                                )
+                            return <span key={"ROUTE_PATH-"+ Math.random() } ></span>
                         })
                     }</div>
                     <ArrowForward />
