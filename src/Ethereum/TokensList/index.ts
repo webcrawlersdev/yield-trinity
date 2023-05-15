@@ -25,8 +25,8 @@ export const tokensList = {
         },
         {
             "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
-            "name": "WETH Token",
-            "symbol": "WETH",
+            "name": "WBNB Token",
+            "symbol": "WBNB",
             "decimals": 18,
             "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_wbtc.svg"
         },

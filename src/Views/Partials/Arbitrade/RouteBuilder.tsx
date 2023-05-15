@@ -9,13 +9,14 @@ export interface IArbitradeRouteBuilder {
     dex: any
     dexId: number
     onRemove(dexId: number): void
+    onShowDexes(old: (state: boolean) => boolean):void
     onShowTokens(old: (state: boolean) => boolean): void
     setParams: IArbitrade['setparams']
 }
 
 export default function ArbitradeRouteBuilder(props: IArbitradeRouteBuilder) {
 
-    const { dex, amount, onRemove, dexId,  onShowTokens, setParams } = props
+    const { dex, amount, onRemove, onShowDexes, dexId,  onShowTokens, setParams } = props
     const [params, storeParams] = useLocalStorage<IParams>('@Params', Params)
 
 
@@ -28,6 +29,10 @@ export default function ArbitradeRouteBuilder(props: IArbitradeRouteBuilder) {
             <Box className="input-area">
                 <Box className="space-between isolated-container" style={{ zIndex: 20 }}>
                     <Button
+                        onClick={() => {
+                            setParams('currentDexId', dexId)
+                            onShowDexes(s => !s)
+                        }}
                         variant='contained'
                         style={{ padding: '.2rem' }}
                         className={`primary-button dark-button ${!dex?.NAME && 'error'}`}>
@@ -39,8 +44,8 @@ export default function ArbitradeRouteBuilder(props: IArbitradeRouteBuilder) {
                 <Button
                     variant="contained"
                     onClick={() => {
-                        onShowTokens(s => !s)
                         setParams('currentDexId', dexId)
+                        onShowTokens(s => !s)
                     }}
                     className=" primary-button dark-button padding-none arb-button-selector">
                     {params?.arbitrade?.dexes?.[dexId]?.paths?.length ? 'PATH' : 'SELECT TRADE PATH'}&nbsp;

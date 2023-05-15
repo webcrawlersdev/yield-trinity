@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { usePrepareContractWrite, useNetwork, useContractWrite, useAccount } from "wagmi";
 import { PRICE_ORACLE } from "../../../Ethereum/ABIs/index.ts"
 import { useADDR } from "../../../Ethereum/Addresses";
-import { toWei } from "../../../Helpers";
+import { toUpper, toWei } from "../../../Helpers";
 import { Web3Button } from "@web3modal/react";
 import { motion } from 'framer-motion'
 import { ethers } from "ethers";
@@ -49,11 +49,11 @@ export default function Summary() {
         address: ADDR['PRICE_ORACLEA'],
         args: (Object.values(Transactable?.[0] || {})),
         overrides: {
-            gasLimit: toWei(76) as ethers.BigNumber
-            // value: toUpper(selectedTrade?.tokenInfo?.address) === toUpper(ADDR['WETH_ADDRESSA']) ? toWei(selectedTrade?.tradeAmount) : 0,
+            gasLimit: toWei(26) as ethers.BigNumber,
+            value: toUpper("W" + chain?.nativeCurrency?.symbol) === toUpper(params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol) ? toWei(params?.arbitrade?.amountIn) : 0,
         },
         cacheTime: 0,
-        enabled: false
+        // enabled: false
     })
 
     const {
@@ -66,10 +66,15 @@ export default function Summary() {
     } = useContractWrite(config)
 
     useEffect(() => {
-        console.log("DONE _ _ _ _ ENOD - - - -")
+        console.log("DONE _ _ _ _ ENOD - - - -",)
         console.log(swapError, isErrorPWRITE, swapHasError, swapE, hasSwapData)
     }, [swapError, isErrorPWRITE, swapHasError, swapE, hasSwapData])
 
+
+    const handleSendTransaction = () => {
+        console.log("TNX   :  ", (Object.values(Transactable?.[0] || {})));
+        swap?.()
+    }
 
     return (
         <div className="arb-summary space-between">
@@ -82,16 +87,15 @@ export default function Summary() {
                     <motion.div animate={{ scale: [.75] }}>
                         {isConnected ?
                             <Button
-                                disabled
-                                onClick={() => swap?.()}
-                                className=' dark-button'
+                                // disabled
+                                onClick={handleSendTransaction}
+                                className='dark-button'
                                 variant="contained">
                                 SEND TRANSACTION
                             </Button> :
                             <Web3Button />
                         }
                     </motion.div>
-
                     <ChevronLeftRounded />
                 </div>
             </div>

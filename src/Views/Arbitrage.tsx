@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Input } from "@mui/material";
+import { Box, Button, Divider, Grid, Input } from "@mui/material";
 import Master from "../Layouts/Master";
 import { useNetwork } from "wagmi";
 import { useState } from "react";
@@ -11,6 +11,8 @@ import ArbitradeRouteBuilder from "./Partials/Arbitrade/RouteBuilder";
 import { TokensList } from "./Partials/Tokens";
 import ArbitrageRoutePath from "./Partials/Arbitrade/RoutePath";
 import Summary from "./Partials/Arbitrade/Summary";
+import { motion } from 'framer-motion'
+import { Link } from "react-router-dom";
 
 
 export default function Arbitrage() {
@@ -100,26 +102,19 @@ export default function Arbitrage() {
                     </Button>
                 </div>
             </Box>
-            <div className="space-between isolated-container" style={{ zIndex: 20 }}>
-                <Button
-                    onClick={() => setShowDexes(o => !o)}
-                    style={{ padding: '.2rem' }}
-                    className={` transparent`}>
-                    Select Dexchange
-                </Button>
-            </div>
+
         </Box>
     )
 
     const TradeRoute = (
-        <Box className="dash-main-box box-stats sticky-top" style={{ background: 'transparent' }}>
+        <Box className="dash-main-box box-stats sticky-top" style={{ background: 'transparent', padding: 0, paddingTop: '1rem' }}>
             <div className="space-between">
                 <h3 className="headline-3 space-between" style={{ gap: '.3rem' }}>
                     <Route />Your Trade Route 🤚
                 </h3>
                 <span></span>
             </div>
-            <br />
+            <hr />
             <div className="trade-routes">
                 {
                     params?.arbitrade?.dexes?.map((dex, index: number) => {
@@ -145,11 +140,32 @@ export default function Arbitrage() {
                             amount={100}
                             dex={a}
                             dexId={index}
+                            onShowDexes={setShowDexes}
                             onRemove={handleRemoveDex}
                             onShowTokens={setShowTokens}
                         />
                     })
+
                 }
+                <br />
+                <div className="space-between">
+                    <Button
+                        variant="contained"
+                        onClick={() => setShowDexes(o => !o)}
+                        style={{ width: '100%' }}
+                        disabled={params?.arbitrade?.dexes?.length as any >= 3}
+                        className={`dark-button primary-button`}>
+                        {params?.arbitrade?.dexes?.length as any >= 3 ? 'Limited For Account' : 'Select  Dexchange'}
+                    </Button>
+                    {
+                        params?.arbitrade?.dexes?.length as any >= 3 &&
+                        <Link
+                            target="_blank"
+                            to={'/increase-limits'}
+                            children='Increase'
+                        />
+                    }
+                </div>
             </Box>
             {TradeRoute}
         </Grid>
@@ -166,6 +182,6 @@ export default function Arbitrage() {
             selected={'NODE'}
             onSelect={appendTokenForPath}
         />
-        
-    </Master>
+
+    </Master >
 }

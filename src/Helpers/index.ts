@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 
 export const precise = (val: string | number, decimals: undefined | number = 2): string => Number(val).toFixed(decimals)
 export const isAddress = (val: string) => ethers.utils.isAddress(String(val))
-export const toUpper = (val: string) => String(val?.toUpperCase())
+export const toUpper = (val: any) => String(String(val)?.toUpperCase())
 export const toLower = (val: string) => String(val?.toLowerCase())
 export const strEqual = (val: string, val1: string): boolean => toUpper(val) === toUpper(val1)
 export const wait = /*@devfred*/ async (seconds?: number) => new Promise((resolved) => setTimeout(() => resolved('continue'), Number(seconds) * 1000 || 1000))

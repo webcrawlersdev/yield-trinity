@@ -42,6 +42,7 @@ export const PRICE_ORACLE = [
     "function tokensLiquidity(  address _token1,  address _token2, address _factory  ) public view returns(uint256 base, uint256 token)",
     "function getTokenFromPair(address _pair) public  view  returns(address tokenAddress, bool isValid)",
     // "function getTokenInfo(address _token) public  view returns(TokenInfo memory)",
+    "function getTokenPriceInWETH( address _token  ) public view returns (uint256 priceInWETH)",
     `function multiPathSwap(
         address[] calldata _paths,
         uint256[] calldata _pathIndex,
