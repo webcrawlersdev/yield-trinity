@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from '@mui/material'
-import { ProviderRpcError, useNetwork } from 'wagmi'
+import {  useNetwork } from 'wagmi'
 import useWindowDimensions from '../../Hooks/useWindowDimensions'
 
 

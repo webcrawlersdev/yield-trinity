@@ -22,9 +22,9 @@ export default function ArbitradeRouteBuilder(props: IArbitradeRouteBuilder) {
 
     return (
         <motion.div
-            animate={{ y: 0, opacity: 1 }}
-            initial={{ y: -20, opacity: .3 }}
-            exit={{ y: 30, opacity: 0 }}
+            // animate={{ y: 0, opacity: 1 }}
+            // initial={{ y: -20, opacity: .3 }}
+            // exit={{ y: 30, opacity: 0 }}
             className="box-input-area bg-box arbitrage-route">
             <Box className="input-area">
                 <Box className="space-between isolated-container" style={{ zIndex: 20 }}>

@@ -7,9 +7,9 @@ import { useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { CircularProgress } from "@mui/material"
 
-// export const RoutePathOutput = () => {
+export const RoutePathOutput = () => {
 
-// }
+}
 
 export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) {
     const { dex, dexId } = props
@@ -35,7 +35,7 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
         address: ADDR['PRICE_ORACLEA'] as any,
         args: [[dex?.ROUTER], [], toWei(
             dexId === 0 ? params?.arbitrade?.amountIn : params?.arbitrade?.dexes?.[dexId - 1]?.output)
-        ]
+        ],
     }
 
     dex?.paths?.map((token, index) => {
@@ -45,18 +45,24 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
         return target
     })
 
-    const { data, error, isLoading } = useContractRead({
+    const { data, error, isLoading, refetch, } = useContractRead({
         ...target,
         watch: true,
-        cacheTime: 0
+        cacheTime: 0,
+        staleTime: 1,
     })
 
     useEffect(() => {
-        handleOutputUpdateForDex(dexId, fmWei(data as any ?? 0))
-    }, [data, error])
+        if (!data) {
+            handleOutputUpdateForDex(dexId, fmWei(0))
+            !isLoading || refetch()
+        }
+        else
+            handleOutputUpdateForDex(dexId, fmWei(data as any ?? 0))
+    }, [data, error, isLoading])
 
 
-    const RoutePath = <div className="trade-path">
+    const RoutePath = <div className="trade-path" key={Math.random()}>
         <div className="dex-name">{dex?.NAME}</div>
         <br />
         <div className="trade-paths space-between">
@@ -64,7 +70,6 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
                 dex?.paths?.map((path: any, index: number) => {
                     return (
                         <div key={"PATH-DEX-" + Math.random()} className="trade-path-ind">
-
                             <div className="space-between">
                                 <div className="space-between" style={{ width: 'max-content', gap: '.3rem' }}>
                                     <div className="token-icon-wrap">
@@ -72,7 +77,7 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
                                     </div>
                                     <span className="token-info">{path?.symbol}</span>
                                 </div>
-                                
+
                                 <span className="trade-amount">
                                     {isLoading ? <CircularProgress size={16} color="warning" />
                                         : (index == 0) &&

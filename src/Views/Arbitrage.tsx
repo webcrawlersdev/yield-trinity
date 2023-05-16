@@ -119,7 +119,7 @@ export default function Arbitrage() {
                 {
                     params?.arbitrade?.dexes?.map((dex, index: number) => {
                         if (dex?.paths?.length > 1)
-                            return <ArbitrageRoutePath dexId={index} dex={dex} />
+                            return <ArbitrageRoutePath key={index} dexId={index} dex={dex} />
                         return <span key={Math.random()}></span>
                     })
                 }

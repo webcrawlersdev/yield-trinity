@@ -7,6 +7,9 @@
      --font-poppins: 'Poppins', sans-serif;
      --body-background-color: rgb(15, 15, 15);
      --box-background-color: rgb(28, 28, 28);
+     --ifm-color-gray-800: #ffffff1a;
+     --ifm-box-bg-color: var(--ifm-color-gray-800);
+     --box-gradient: linear-gradient(135deg, var(--ifm-box-bg-color) 0, #0000 100%);
      --font-family-sans-serif: "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
      --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
  }

@@ -4,7 +4,7 @@ export const precise = (val: string | number, decimals: undefined | number = 2):
 export const isAddress = (val: string) => ethers.utils.isAddress(String(val))
 export const toUpper = (val: any) => String(String(val)?.toUpperCase())
 export const toLower = (val: string) => String(val?.toLowerCase())
-export const strEqual = (val: string, val1: string): boolean => toUpper(val) === toUpper(val1)
+export const strEqual = (val: string | undefined, val1: string | undefined): boolean => toUpper(val) === toUpper(val1)
 export const wait = /*@devfred*/ async (seconds?: number) => new Promise((resolved) => setTimeout(() => resolved('continue'), Number(seconds) * 1000 || 1000))
 export const toBN = (val: string | number): ethers.BigNumber => ethers.BigNumber.from(val)
 export const fmtNumCompact = (val: number | string): string => Intl.NumberFormat("en", { notation: "compact" }).format(Number(val))
@@ -29,7 +29,7 @@ export const fmWei = (val: string | number, decimals: undefined | string | numbe
     return ethers.utils.formatUnits(String(val), decimals)
 }
 
-export const toWei = (val: string | number, decimals: undefined | number = 18): ethers.BigNumber | number => {
+export const toWei = (val: string | number, decimals: any = 18): ethers.BigNumber | number => {
     if (!val || !decimals) return ethers.utils.parseUnits(String(0), 18)
     return ethers.utils.parseUnits(String(val), decimals)
 }

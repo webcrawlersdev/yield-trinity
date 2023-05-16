@@ -1,3 +1,9 @@
+// import PriceOracleAbi from '../../Constants/price-oracle-abi.json'
+// import SharedWalletAbi from '../../Constants/shared-wallet-abi.json'
+// export const SHARED_WALLET = SharedWalletAbi 
+// export const PRICE_ORACLE = PriceOracleAbi
+
+
 export const SHARED_WALLET = [
     "function deposit(uint256 _lockPeriod) payable ",
     "function withdraw(uint256 amount)",
@@ -20,6 +26,7 @@ export const SHARED_WALLET = [
     "function symbol() public view returns (string memory)",
     "function hasLiquidity(  address _token1,  address _token2  ) public view returns(bool hasliquidity)"
 ]
+
 
 export const PRICE_ORACLE = [
     "function decimals() public view returns (uint256)",
@@ -45,7 +52,7 @@ export const PRICE_ORACLE = [
     "function getTokenPriceInWETH( address _token  ) public view returns (uint256 priceInWETH)",
     `function multiPathSwap(
         address[] calldata _paths,
-        uint256[] calldata _pathIndex,
+        uint256[] calldata _pathLengths,
         address[] calldata  _routes,
         uint256[] calldata  _inputes,
         uint256[] calldata _minOutputs,
