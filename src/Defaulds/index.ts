@@ -4,6 +4,16 @@ export interface IArbitrade {
     setparams(key: IParams['arbitrade']['keys'], val: any): void
 }
 
+export interface IArbitradeRouteBuilder {
+    amount: number,
+    dex: any
+    dexId: number
+    onRemove(dexId: number): void
+    onShowDexes(old: (state: boolean) => boolean): void
+    onShowTokens(old: (state: boolean) => boolean): void
+    setParams: IArbitrade['setparams']
+}
+
 export interface ITokenInfo {
     logoURI: string
     address: string

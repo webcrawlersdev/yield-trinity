@@ -1,6 +1,6 @@
-import { Box, Button, Divider, Grid, Input } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import Master from "../Layouts/Master";
-import { useNetwork } from "wagmi";
+import { useAccount, useNetwork, useProvider, useBalance } from "wagmi";
 import { useState } from "react";
 import DexChanges from "./Partials/DexChanges";
 import useDecentralizedExchange from "../Hooks/useDecentralizedExchamge";
@@ -11,8 +11,8 @@ import ArbitradeRouteBuilder from "./Partials/Arbitrade/RouteBuilder";
 import { TokensList } from "./Partials/Tokens";
 import ArbitrageRoutePath from "./Partials/Arbitrade/RoutePath";
 import Summary from "./Partials/Arbitrade/Summary";
-import { motion } from 'framer-motion'
-import { Link } from "react-router-dom";
+import { useEffect } from 'react'
+import { cut, fmWei, precise } from "../Helpers";
 
 
 export default function Arbitrage() {
@@ -21,6 +21,13 @@ export default function Arbitrage() {
     const [showTokens, setShowTokens] = useState(false)
     const { dexs } = useDecentralizedExchange()
     const [params, storeParams] = useLocalStorage<IParams>('@Params', Params)
+    const { address } = useAccount()
+
+    const frombalance = useBalance({
+        address,
+        token: params?.arbitrade?.dexes?.[0]?.paths?.[0]?.address as any,
+        enabled: Boolean(params?.arbitrade?.dexes?.[0]?.paths?.[0]?.address)
+    })
 
     const setParams = (key: IParams['arbitrade']['keys'], val: any) =>
         storeParams(o => o = { ...o, arbitrade: { ...o.arbitrade, [key]: val } })
@@ -78,32 +85,24 @@ export default function Arbitrage() {
     }
 
     const RouteBuilder = (
-        <Box className="input-area">
-            <Box className="bg-box arbitrage-route" style={{ padding: '.4rem', marginTop: 0 }}>
-                <div className="space-between" style={{ gap: 0, paddingInline: '.6rem' }}>
-                    <Input
-                        disableUnderline
-                        type="number"
-                        value={params?.arbitrade?.amountIn}
-                        maxRows={1}
-                        autoFocus
-                        error={String(params?.arbitrade?.amountIn).length > 15 ? true : false}
-                        className="input-reading transparent-input"
-                        onChange={({ target: { value } }) => setParams('amountIn', Number(value))}
-                        placeholder={'Amount In 0.001'}
-                    />
-                    <Button
-                        onClick={() => {
-                            setParams('currentDexId', 0)
-                            setShowTokens(s => !s)
-                        }}
-                        style={{ paddingRight: 0 }}>
-                        {params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol}
-                    </Button>
+        <div className="filter-input-wrapper space-between" style={{ width: '100%',  }}>
+            <input className="input-reading"
+                type="number"
+                onChange={({ target: { value } }) => setParams('amountIn', Number(value))}
+                onFocus={() => { }}
+                value={params?.arbitrade?.amountIn}
+                placeholder='Amount to spend' />
+            {/* <Button
+                onClick={() => {
+                    setParams('currentDexId', 0)
+                    setShowTokens(s => !s)
+                }}
+                style={{ paddingRight: 0 }}> */}
+                <div className="space-between" style={{ minWidth: 'max-content' }}>
+                    {params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol} {precise(frombalance?.data?.formatted ?? 0, 3)}
                 </div>
-            </Box>
-
-        </Box>
+            {/* </Button> */}
+        </div>
     )
 
     const TradeRoute = (
@@ -114,7 +113,6 @@ export default function Arbitrage() {
                 </h3>
                 <span></span>
             </div>
-            <hr />
             <div className="trade-routes">
                 {
                     params?.arbitrade?.dexes?.map((dex, index: number) => {
@@ -124,7 +122,6 @@ export default function Arbitrage() {
                     })
                 }
             </div>
-            <Summary />
         </Box>
     )
 
@@ -145,29 +142,10 @@ export default function Arbitrage() {
                             onShowTokens={setShowTokens}
                         />
                     })
-
                 }
-                <br />
-                <div className="space-between">
-                    <Button
-                        variant="contained"
-                        onClick={() => setShowDexes(o => !o)}
-                        style={{ width: '100%' }}
-                        disabled={params?.arbitrade?.dexes?.length as any >= 3}
-                        className={`dark-button primary-button`}>
-                        {params?.arbitrade?.dexes?.length as any >= 3 ? 'Limited For Account' : 'Select  Dexchange'}
-                    </Button>
-                    {
-                        params?.arbitrade?.dexes?.length as any >= 3 &&
-                        <Link
-                            target="_blank"
-                            to={'/increase-limits'}
-                            children='Increase'
-                        />
-                    }
-                </div>
             </Box>
             {TradeRoute}
+            <Summary onShowDexes={setShowDexes} />
         </Grid>
         {/* MODALS */}
         <DexChanges

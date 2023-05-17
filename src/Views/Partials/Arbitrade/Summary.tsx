@@ -1,14 +1,16 @@
-import { ChevronRightRounded, ChevronLeftRounded } from "@mui/icons-material";
-import { Button } from "@mui/material";
+import { ChevronRightRounded, ChevronLeftRounded, ArrowRight, ExpandCircleDownRounded } from "@mui/icons-material";
+import { Button, CircularProgress } from "@mui/material";
 import { useLocalStorage } from "usehooks-ts";
-import { Params, IParams } from "../../../Defaulds";
+import { Params, IParams, IArbitradeRouteBuilder } from "../../../Defaulds";
 import { useEffect, useState } from "react";
-import { usePrepareContractWrite, useNetwork, useContractWrite, useAccount, useContractRead } from "wagmi";
+import { usePrepareContractWrite, useNetwork, useWaitForTransaction, useContractWrite, useAccount, useContractRead } from "wagmi";
 import { PRICE_ORACLE } from "../../../Ethereum/ABIs/index.ts"
 import { useADDR } from "../../../Ethereum/Addresses";
-import { fmWei, toUpper, toWei, strEqual } from "../../../Helpers";
+import { fmWei, toWei, strEqual, precise, sub } from "../../../Helpers";
 import { Web3Button } from "@web3modal/react";
 import { motion } from 'framer-motion'
+import { toast } from 'react-toastify'
+import { Link } from "react-router-dom";
 import { ethers } from "ethers";
 
 export interface ITranactionBuillder {
@@ -20,7 +22,7 @@ export interface ITranactionBuillder {
     _deadline: number
 }
 
-export default function Summary() {
+export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['onShowDexes'] }) {
 
     const [params, storeParams] = useLocalStorage<IParams>('@Params', Params)
     const [ButtonText, setButtonText] = useState<string>("Start Transaction")
@@ -43,21 +45,22 @@ export default function Summary() {
         return Builder
     })
 
-    const { config, error: swapError, isError: isErrorPWRITE } = usePrepareContractWrite({
+    const { config, error: writePrepareError, isError: isWritePrepareError } = usePrepareContractWrite({
         functionName: 'multiPathSwap',
         abi: PRICE_ORACLE,
         address: ADDR['PRICE_ORACLEA'],
         args: (Object.values(Transactable?.[0] || [])),
         overrides: {
-            gasLimit: toWei(0.005, 'gwei') as ethers.BigNumber,
-            gasPrice: toWei(10, 'gwei') as ethers.BigNumber,
+            // gasLimit: toWei(0.004, 'gwei') as ethers.BigNumber,
+            // gasPrice: toWei(10, 'gwei') as ethers.BigNumber,
             // maxFeePerGas: toWei(20, 'gwei') as ethers.BigNumber,
             // maxPriorityFeePerGas: toWei(25, 'gwei') as ethers.BigNumber,
             value: strEqual(params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol?.slice(-3), chain?.nativeCurrency?.symbol?.slice(-3)) ? toWei(params?.arbitrade?.amountIn) : 0
         },
         cacheTime: 0,
         enabled: Boolean(Number(params?.arbitrade?.dexes?.[0]?.paths?.length) > 1 &&
-            Number(params?.arbitrade?.dexes?.[params?.arbitrade?.dexes?.length - 1]?.paths?.length) > 1)
+            Number(params?.arbitrade?.dexes?.[params?.arbitrade?.dexes?.length - 1]?.paths?.length) > 1),
+        staleTime: 0
 
     })
 
@@ -67,7 +70,7 @@ export default function Summary() {
         isLoading: isTransacting,
         isError: swapHasError,
         error: swapE,
-        reset: resetSwap
+        reset: resetSwap,
     } = useContractWrite(config)
 
     const { data: tokenAllowance } = useContractRead({
@@ -77,6 +80,7 @@ export default function Summary() {
         args: [address, ADDR['PRICE_ORACLEA']],
         enabled: !strEqual(params?.arbitrade?.dexes?.[0]?.paths?.[0]?.address, ADDR?.WETH_ADDRESSA),
         cacheTime: 0,
+        staleTime: 0,
         watch: true,
     })
 
@@ -85,9 +89,13 @@ export default function Summary() {
         functionName: 'approve',
         abi: PRICE_ORACLE,
         address: params?.arbitrade?.dexes?.[0]?.paths?.[0]?.address as any,
-        args: [ADDR['PRICE_ORACLEA'], toWei(5e10)]
+        args: [ADDR['PRICE_ORACLEA'], toWei(5e10)],
     })
 
+    const waitTransaction = useWaitForTransaction({
+        hash: approvalData?.hash || hasSwapData?.hash,
+        enabled: Boolean(approvalData?.hash || hasSwapData?.hash),
+    })
 
     const hasAllowance = () => {
         if (!strEqual(params?.arbitrade?.dexes?.[0]?.paths?.[0]?.address, ADDR?.WETH_ADDRESSA))
@@ -98,59 +106,107 @@ export default function Summary() {
     const handleSendTransaction = async () => {
         if (hasAllowance() <= 0)
             return approve()
-        console.log(hasSwapData, isErrorPWRITE, swapError, swapE, swapHasError, hasAllowance(),
-            params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol, chain?.nativeCurrency?.symbol
-        )
         swap?.()
     }
 
     useEffect(() => {
-        if (hasAllowance() <= 0)
+        const TRANSACTING_TOAST_ID = 'TRANSACTING';
+        const TRANSACTION_TOAST_ER = "ERROR"
+
+        if (hasAllowance() <= 0 && params?.arbitrade?.dexes?.[0]?.paths?.[0]?.address)
             setButtonText("Approve ".concat(params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol as string))
         if (isApproving)
             setButtonText('Approving...'.concat(params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol as string))
 
-
+        if (waitTransaction.isLoading)
+            toast.promise(
+                hasSwapData?.wait as any || approvalData?.wait as any,
+                { error: 'An Error Occured', success: 'Successful', pending: 'Wait, Working...' },
+                { toastId: TRANSACTING_TOAST_ID }
+            );
+        if (isWritePrepareError) {
+            toast.warn('This transaction is likely going to fail...', {
+                'autoClose': false,
+                'position': 'bottom-center',
+                toastId: TRANSACTING_TOAST_ID
+            })
+        }
 
         return () => {
             setButtonText('Send transaction')
-            // resetSwap()
+            resetSwap()
         }
     }, [
         tokenAllowance,
-        swapError,
-        isErrorPWRITE,
         swapHasError,
         swapE,
+        isWritePrepareError,
         hasSwapData,
         isApproving,
         params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol
-    ]
-    )
+    ])
 
     return (
-        <div className="arb-summary space-between">
-            <ChevronRightRounded />
+        <div className="arb-summary space-between" style={{ flexWrap: 'wrap' }}>
             <div className="space-between">
-                <div className="space-between">
-
-                </div>
-                <div className="space-between">
-                    <motion.div animate={{ scale: [.75] }}>
-                        {isConnected ?
-                            <Button
-                                disabled={isApproving || isTransacting}
-                                onClick={handleSendTransaction}
-                                className='dark-button'
-                                variant="contained">
-                                {ButtonText}
-                            </Button> :
-                            <Web3Button />
-                        }
-                    </motion.div>
-                    <ChevronLeftRounded />
-                </div>
+                <Button
+                    onClick={() => props?.onShowDexes?.(o => !o)}
+                    style={{ margin: 0, flexGrow: 1, fontSize: 12, fontWeight: 400 }}
+                    disabled={params?.arbitrade?.dexes?.length as any >= 3}
+                    className={`primary-button summary-container`}>
+                    {params?.arbitrade?.dexes?.length as any >= 3 ? 'Limited For Account' : 'Select  Dexchange'}
+                </Button>
             </div>
+            <div className="space-between" style={{ flexWrap: 'wrap' }}>
+                <div className="space-between" style={{ flexWrap: 'wrap' }}>
+                    <div className="summary-container">
+                        <span className="trade-amount">
+                            <span className="orangered">Input</span>&nbsp;
+                            {precise(params?.arbitrade?.amountIn)}&nbsp;
+                            {params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol}
+                        </span>
+                    </div>
+                    <ArrowRight />
+                    <div className="summary-container">
+                        <span className="trade-amount">
+                            <span className="green">Expect</span>&nbsp;
+                            <span className="orangered">
+                                {
+                                    params?.arbitrade?.dexes?.[params?.arbitrade?.dexes?.length - 1]?.output ?
+                                        precise(sub(
+                                            params?.arbitrade?.dexes?.[params?.arbitrade?.dexes?.length - 1]?.output,
+                                            params?.arbitrade?.dexes?.[params?.arbitrade?.dexes?.length - 1]?.output * 0.03 / 100)
+                                            , 5) : <CircularProgress size={13} color="warning" />
+                                }
+                            </span>&nbsp;
+                            {
+                                params?.arbitrade?.dexes?.[params?.arbitrade?.dexes?.length - 1]
+                                    ?.paths?.[params?.arbitrade?.dexes?.[params?.arbitrade?.dexes?.length - 1]
+                                        ?.paths?.length - 1]?.symbol.concat('+')
+                            }
+                        </span>
+                    </div>
+                </div>
+                {
+                    isWritePrepareError && <div className="error-message  " style={{ flexGrow: 1 }}>
+                        TNX May Fail
+                        <div className="message">
+                            {writePrepareError?.message}
+                        </div>
+                    </div>
+                }
+                {isConnected ?
+                    <Button
+                        style={{ margin: 0, flexGrow: 1, fontSize: 12, fontWeight: 400 }}
+                        disabled={waitTransaction?.isLoading || isApproving || isTransacting}
+                        onClick={handleSendTransaction}
+                        className='primary-button summary-container' >
+                        {ButtonText} {waitTransaction?.isLoading || isApproving || isTransacting && <CircularProgress size={13} color="success" />}
+                    </Button> :
+                    <Web3Button />
+                }
+            </div>
+
         </div>
     )
 }

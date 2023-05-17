@@ -45,11 +45,11 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
         return target
     })
 
-    const { data, error, isLoading, refetch, } = useContractRead({
+    const { data, error, isLoading, refetch, status } = useContractRead({
         ...target,
         watch: true,
         cacheTime: 0,
-        staleTime: 1,
+        staleTime: 0,
     })
 
     useEffect(() => {
@@ -59,7 +59,7 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
         }
         else
             handleOutputUpdateForDex(dexId, fmWei(data as any ?? 0))
-    }, [data, error, isLoading])
+    }, [data, error, status])
 
 
     const RoutePath = <div className="trade-path" key={Math.random()}>

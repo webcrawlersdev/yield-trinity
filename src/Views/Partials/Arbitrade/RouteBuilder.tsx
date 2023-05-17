@@ -2,17 +2,9 @@ import { ArrowForward, Close } from "@mui/icons-material";
 import { Box, Button } from "@mui/material";
 import { motion } from 'framer-motion'
 import { useLocalStorage } from "usehooks-ts";
-import { Params, IParams, IArbitrade } from "../../../Defaulds";
+import { Params, IParams, IArbitradeRouteBuilder } from "../../../Defaulds";
 
-export interface IArbitradeRouteBuilder {
-    amount: number,
-    dex: any
-    dexId: number
-    onRemove(dexId: number): void
-    onShowDexes(old: (state: boolean) => boolean):void
-    onShowTokens(old: (state: boolean) => boolean): void
-    setParams: IArbitrade['setparams']
-}
+
 
 export default function ArbitradeRouteBuilder(props: IArbitradeRouteBuilder) {
 
