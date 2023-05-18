@@ -36,7 +36,7 @@ export default function Arbitrage() {
         setShowDexes(false)
         const selected = params?.arbitrade?.dexes || []
         const dex = dexs?.filter((d: any) => d?.NAME === dexname)[0]
-        if (Number(params?.arbitrade?.dexes?.length) >= 3)
+        if (Number(params?.arbitrade?.dexes?.length) >= 4)
             selected[Number(params?.arbitrade?.dexes?.length) - 1] = dex as IDex
         else
             selected[Number(params?.arbitrade?.dexes?.length)] = dex

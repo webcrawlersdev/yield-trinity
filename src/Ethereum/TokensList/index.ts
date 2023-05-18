@@ -1,7 +1,7 @@
 export const tokensList = {
     [97]: [
         { "address": "0x6ce8dA28E2f864420840cF74474eFf5fD80E65B8", "name": "BTCB Token", "symbol": "BTCB", "decimals": 18, "logoURI": "https://s2.coinmarketcap.com/static/img/coins/64x64/2837.png" },
-        // { "address": "0xEC5dCb5Dbf4B114C9d0F65BcCAb49EC54F6A0867", "name": "Dai Token", "symbol": "DAI", "decimals": 18,logoURI:"https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_DAI.svg" },
+        { "address": "0xEC5dCb5Dbf4B114C9d0F65BcCAb49EC54F6A0867", "name": "Dai Token", "symbol": "DAI", "decimals": 18,logoURI:"https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_DAI.svg" },
         // {
         //     "address": "0xB3319f5D18Bc0D84dD1b4825Dcde5d5f7266d407",
         //     "name": "Compound 0x",

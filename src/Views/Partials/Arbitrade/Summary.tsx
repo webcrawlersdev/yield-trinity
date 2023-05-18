@@ -152,9 +152,9 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
                 <Button
                     onClick={() => props?.onShowDexes?.(o => !o)}
                     style={{ margin: 0, flexGrow: 1, fontSize: 12, fontWeight: 400 }}
-                    disabled={params?.arbitrade?.dexes?.length as any >= 3}
+                    disabled={params?.arbitrade?.dexes?.length as any >= 4}
                     className={`primary-button summary-container`}>
-                    {params?.arbitrade?.dexes?.length as any >= 3 ? 'Limited For Account' : 'Select  Dexchange'}
+                    {params?.arbitrade?.dexes?.length as any >= 4 ? 'Limited For Account' : 'Select  Dexchange'}
                 </Button>
             </div>
             <div className="space-between" style={{ flexWrap: 'wrap' }}>

@@ -16,16 +16,16 @@ export default function Heading() {
                     <Typography component={'h1'}>
                         <a className='site-name' href={window.location.href}>{innerWidth < 700 ? "YT" : window.location.pathname.replace('#/', '').replace('-', ' ')}</a>
                     </Typography>
-                    <motion.div animate={{ scale: [.75] }}>
+                    {/* <motion.div animate={{ scale: [.75] }}> */}
                         {innerWidth > 600 && <Web3NetworkSwitch />}
-                    </motion.div>
+                    {/* </motion.div> */}
                 </div>
-                <motion.div animate={{ scale: [.75] }}>
+                {/* <motion.div animate={{ scale: [.75] }}> */}
                     <Web3Button
                         avatar={'show'}
                         balance={'show'}
                         icon='show' />
-                </motion.div>
+                {/* </motion.div> */}
             </Box>
         </Box >
     )
