@@ -43,7 +43,7 @@ export default function ArbitradeRouteBuilder(props: IArbitradeRouteBuilder) {
                     {params?.arbitrade?.dexes?.[dexId]?.paths?.length ? 'PATH' : 'SELECT TRADE PATH'}&nbsp;
 
                     <div className="tokens-path-is">{
-                        (params?.arbitrade?.dexes as any)?.map((dex: any, index: number) => {
+                        params?.arbitrade?.dexes?.map((dex: any, index: number) => {
                             if (index === dexId)
                                 return dex?.paths?.map((path: any) =>
                                     <div className="token-icon-wrap" key={"ROUTE_PATH-" + Math.random()}>

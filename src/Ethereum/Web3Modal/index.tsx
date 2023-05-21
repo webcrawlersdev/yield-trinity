@@ -5,7 +5,7 @@ import { arbitrum, mainnet, polygon, bscTestnet, bsc } from 'wagmi/chains'
 
 export default function ({ children }: { children: React.ReactNode }) {
 
-    const chains = [bscTestnet] //arbitrum, mainnet, polygon,
+    const chains = [bscTestnet, polygon, bsc] //arbitrum, mainnet, polygon,
     const projectId = (process.env.REACT_APP_WAGMI_APP_ID) as any
 
     const { provider } = configureChains(chains,

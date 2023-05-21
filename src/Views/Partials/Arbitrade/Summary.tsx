@@ -1,16 +1,14 @@
-import { ChevronRightRounded, ChevronLeftRounded, ArrowRight, ExpandCircleDownRounded } from "@mui/icons-material";
+import { ArrowRight } from "@mui/icons-material";
 import { Button, CircularProgress } from "@mui/material";
 import { useLocalStorage } from "usehooks-ts";
 import { Params, IParams, IArbitradeRouteBuilder } from "../../../Defaulds";
 import { useEffect, useState } from "react";
-import { usePrepareContractWrite, useNetwork, useWaitForTransaction, useContractWrite, useAccount, useContractRead } from "wagmi";
+import { usePrepareContractWrite, useNetwork, useWaitForTransaction, useContractWrite, useAccount, useContractRead, useProvider } from "wagmi";
 import { PRICE_ORACLE } from "../../../Ethereum/ABIs/index.ts"
 import { useADDR } from "../../../Ethereum/Addresses";
 import { fmWei, toWei, strEqual, precise, sub } from "../../../Helpers";
 import { Web3Button } from "@web3modal/react";
-import { motion } from 'framer-motion'
 import { toast } from 'react-toastify'
-import { Link } from "react-router-dom";
 import { ethers } from "ethers";
 
 export interface ITranactionBuillder {
@@ -27,6 +25,7 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
     const [params, storeParams] = useLocalStorage<IParams>('@Params', Params)
     const [ButtonText, setButtonText] = useState<string>("Start Transaction")
     const { isConnected, address, } = useAccount()
+    const provider = useProvider()
 
     const { chain } = useNetwork()
     const ADDR = useADDR(chain?.id);
@@ -124,13 +123,23 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
                 { error: 'An Error Occured', success: 'Successful', pending: 'Wait, Working...' },
                 { toastId: TRANSACTING_TOAST_ID }
             );
-        if (isWritePrepareError) {
-            toast.warn('This transaction is likely going to fail...', {
-                'autoClose': false,
-                'position': 'bottom-center',
-                toastId: TRANSACTING_TOAST_ID
-            })
-        }
+        // if (isWritePrepareError) {
+        //     toast.warn('This transaction is likely going to fail...', {
+        //         'autoClose': false,
+        //         'position': 'bottom-center',
+        //         toastId: TRANSACTING_TOAST_ID
+        //     })
+        // }
+
+        (async () => {
+            if (approvalData?.hash as any || hasSwapData?.hash as any) {
+                const feeData = await provider.getFeeData()
+                const functionGasFees = await provider.estimateGas(approvalData?.hash as any || hasSwapData?.hash as any)
+                const txGasPrice = functionGasFees.mul(feeData.maxFeePerGas as any)
+                console.log(txGasPrice, 'EST> FEES')
+            }
+        })();
+        console.log('HEY FRED')
 
         return () => {
             setButtonText('Send transaction')

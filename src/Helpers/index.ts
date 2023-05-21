@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 
-export const precise = (val: string | number, decimals: undefined | number = 2): string => Number(val).toFixed(decimals)
+export const precise = (val: string | number, decimals: undefined | number = 4): string => Number(val).toFixed(decimals)
 export const isAddress = (val: string) => ethers.utils.isAddress(String(val))
 export const toUpper = (val: any) => String(String(val)?.toUpperCase())
 export const toLower = (val: string) => String(val?.toLowerCase())
