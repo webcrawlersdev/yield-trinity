@@ -1,27 +1,31 @@
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button, CircularProgress, FormControlLabel, Grid, Switch } from "@mui/material";
 import Master from "../Layouts/Master";
-import { useAccount, useNetwork, useProvider, useBalance } from "wagmi";
-import { useState } from "react";
+import { useAccount, useNetwork, useBalance, useSignMessage } from "wagmi";
+import { useState, useEffect } from "react";
 import DexChanges from "./Partials/DexChanges";
 import useDecentralizedExchange from "../Hooks/useDecentralizedExchamge";
-import { Route } from "@mui/icons-material";
+import { Route, Settings } from "@mui/icons-material";
 import { useLocalStorage } from "usehooks-ts";
 import { IDex, IParams, ITokenInfo, Params } from "../Defaulds";
 import ArbitradeRouteBuilder from "./Partials/Arbitrade/RouteBuilder";
 import { TokensList } from "./Partials/Tokens";
 import ArbitrageRoutePath from "./Partials/Arbitrade/RoutePath";
 import Summary from "./Partials/Arbitrade/Summary";
-import { useEffect } from 'react'
-import { cut, fmWei, precise } from "../Helpers";
+import { precise } from "../Helpers";
+import ArbitrageSettings from "./Partials/Arbitrade/ArbitrageSettings";
+import { toast } from 'react-toastify'
 
 
 export default function Arbitrage() {
     const { chain } = useNetwork()
     const [showDexes, setShowDexes] = useState(false)
     const [showTokens, setShowTokens] = useState(false)
+    const [isShowingSettings, setisShowingSettings] = useState(false)
     const { dexs } = useDecentralizedExchange()
     const [params, storeParams] = useLocalStorage<IParams>('@Params', Params)
+    const { arbitrade: { settings: arbSettings } } = params
     const { address } = useAccount()
+    const signerMessage = useSignMessage()
 
     const frombalance = useBalance({
         address,
@@ -84,82 +88,122 @@ export default function Arbitrage() {
         setParams('dexes', modifiedDex)
     }
 
-    const RouteBuilder = (
-        <div className="filter-input-wrapper space-between" style={{ width: '100%',  }}>
-            <input className="input-reading"
-                type="number"
-                onChange={({ target: { value } }) => setParams('amountIn', Number(value))}
-                onFocus={() => { }}
-                value={params?.arbitrade?.amountIn}
-                placeholder='Amount to spend' />
-            {/* <Button
-                onClick={() => {
-                    setParams('currentDexId', 0)
-                    setShowTokens(s => !s)
-                }}
-                style={{ paddingRight: 0 }}> */}
-                <div className="space-between" style={{ minWidth: 'max-content' }}>
-                    {params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol} {precise(frombalance?.data?.formatted ?? 0, 3)}
-                </div>
-            {/* </Button> */}
-        </div>
+    useEffect(() => {
+        if (signerMessage?.data) {
+            if (signerMessage?.isSuccess)
+                arbSettings?.auto || setParams('settings', { ...arbSettings, auto: true })
+        }
+
+
+        return () => {
+            signerMessage?.reset()
+        }
+    }, [signerMessage?.data, signerMessage?.isSuccess])
+
+    const handleUseAuto = () => {
+        if (arbSettings?.auto) return setParams('settings', { ...arbSettings, auto: false })
+
+        signerMessage.signMessage({
+            message: "By signing this message, You are athourizing Yieldtrinity to use your wallet to make trades on your behalf...",
+        })
+    }
+
+
+    return (
+        <Master>
+            <Grid className="dash relative" style={{ maxHeight: '100%' }}>
+                <Box className='space-between' style={{ width: '100%' }}>
+                    <Box className="dash-lin-box  transparent padding-none" style={{ boxShadow: 'none' }}>
+                        {/* ROUTE BUILDER FOR PATH */}
+                        <div className="space-between" style={{ width: '100%', }}>
+                            <div className="space-between">
+                                <FormControlLabel
+                                    control={<Switch
+                                        onChange={handleUseAuto}
+                                        checked={arbSettings?.auto} />}
+                                    label="Auto"
+                                />
+                                <CircularProgress
+                                    color="inherit"
+                                    size={10}
+                                />
+                            </div>
+                            <Settings
+                                className="primary-button"
+                                onClick={() => setisShowingSettings(s => !s)}
+                            />
+                        </div>
+                        <br />
+                        <div className="space-between">
+                            <input className="input-reading styled-input"
+                                type="number"
+                                onChange={({ target: { value } }) => setParams('amountIn', Number(value))}
+                                onFocus={() => { }}
+                                value={params?.arbitrade?.amountIn}
+                                placeholder='Amount to spend' />
+                        </div>
+                        <small className="space-between" style={{ minWidth: 'max-content', padding: '.5rem', fontSize: 10, opacity: .6 }}>
+                            Balance {params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol}&nbsp;{precise(frombalance?.data?.formatted ?? 0, 10)}
+                        </small>
+                    </Box>
+                    <Box className="dash-main-box box-stats sticky-top"></Box>
+                </Box>
+                <Box className="dash-lin-box sticky-top transparent padding-none" style={{ boxShadow: 'none' }}>
+                    {
+                        params?.arbitrade?.dexes?.map((a: any, index: any) => {
+                            return <ArbitradeRouteBuilder
+                                key={"ROUTE_BUILDER-" + Math.random()}
+                                setParams={(key: any, val: any) => setParams(key, val)}
+                                amount={100}
+                                dex={a}
+                                dexId={index}
+                                onShowDexes={setShowDexes}
+                                onRemove={handleRemoveDex}
+                                onShowTokens={setShowTokens}
+                            />
+                        })
+                    }
+                </Box>
+                {/* TRADE ROUTES */}
+                <Box className="dash-main-box box-stats sticky-top" style={{ background: 'transparent', padding: 0 }}>
+                    <div className="space-between">
+                        <h3 className="headline-3 space-between" style={{ gap: '.3rem' }}>
+                            <Route />Routes 🤚
+                        </h3>
+                        <span></span>
+                    </div>
+                    <div className="trade-routes">
+                        {
+                            params?.arbitrade?.dexes?.map((dex, index: number) => {
+                                if (dex?.paths?.length > 1)
+                                    return <ArbitrageRoutePath key={index} dexId={index} dex={dex} />
+                                return <span key={Math.random()}></span>
+                            })
+                        }
+                    </div>
+                </Box>
+                {/* TRADE SUMMARY AND SEND TRANSACTION */}
+                <Summary onShowDexes={setShowDexes} />
+            </Grid>
+            {/* MODALS */}
+            <DexChanges
+                selected={null}
+                shown={showDexes}
+                onSelect={handleNewDexSelected}
+                toggle={setShowDexes}
+            />
+            <ArbitrageSettings
+                shown={isShowingSettings}
+                toggle={setisShowingSettings}
+                setparams={setParams}
+            />
+            <TokensList
+                shown={showTokens}
+                toggle={setShowTokens}
+                selected={'NODE'}
+                onSelect={appendTokenForPath}
+            />
+
+        </Master>
     )
-
-    const TradeRoute = (
-        <Box className="dash-main-box box-stats sticky-top" style={{ background: 'transparent', padding: 0, paddingTop: '1rem' }}>
-            <div className="space-between">
-                <h3 className="headline-3 space-between" style={{ gap: '.3rem' }}>
-                    <Route />Your Trade Route 🤚
-                </h3>
-                <span></span>
-            </div>
-            <div className="trade-routes">
-                {
-                    params?.arbitrade?.dexes?.map((dex, index: number) => {
-                        if (dex?.paths?.length > 1)
-                            return <ArbitrageRoutePath key={index} dexId={index} dex={dex} />
-                        return <span key={Math.random()}></span>
-                    })
-                }
-            </div>
-        </Box>
-    )
-
-    return <Master>
-        <Grid className="dash relative" style={{ borderRadius: 5, maxHeight: '100%' }}>
-            <Box className="dash-lin-box sticky-top transparent padding-none">
-                {RouteBuilder}
-                {
-                    params?.arbitrade?.dexes?.map((a: any, index: any) => {
-                        return <ArbitradeRouteBuilder
-                            key={"ROUTE_BUILDER-" + Math.random()}
-                            setParams={(key: any, val: any) => setParams(key, val)}
-                            amount={100}
-                            dex={a}
-                            dexId={index}
-                            onShowDexes={setShowDexes}
-                            onRemove={handleRemoveDex}
-                            onShowTokens={setShowTokens}
-                        />
-                    })
-                }
-            </Box>
-            {TradeRoute}
-            <Summary onShowDexes={setShowDexes} />
-        </Grid>
-        {/* MODALS */}
-        <DexChanges
-            selected={null}
-            shown={showDexes}
-            onSelect={handleNewDexSelected}
-            toggle={setShowDexes}
-        />
-        <TokensList
-            shown={showTokens}
-            toggle={setShowTokens}
-            selected={'NODE'}
-            onSelect={appendTokenForPath}
-        />
-
-    </Master >
 }

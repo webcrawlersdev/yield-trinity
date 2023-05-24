@@ -469,10 +469,10 @@ export default function ManualSnipper(props: ISnipperParams) {
                     </Box>
 
                     <motion.div className="trade-route ">
-                        {selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol}
+                        {cut(selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol, 'right')}
                         <span className="green">{fmtNumCompact(selectedTrade?.tradeAmount)}</span>
                         <DoubleArrow />
-                        {selectedTrade.tradeType === 'sell' ? token0?.symbol : token1?.symbol}
+                        {cut(selectedTrade.tradeType === 'sell' ? token0?.symbol : token1?.symbol, 'right')}
                         {isFetchingOutput ? <CircularProgress color="inherit" size={10} /> : <span className="green">{fmtNumCompact(routeOutputs?.RoutOutputs)}</span>}
                     </motion.div>
 

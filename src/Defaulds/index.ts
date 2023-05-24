@@ -52,10 +52,13 @@ export interface IParams {
     }
 
     arbitrade: {
-        keys: 'dexes' | 'currentDexId' | 'amountIn'
+        keys: 'dexes' | 'currentDexId' | 'amountIn' | 'settings'
         currentDexId: number
         amountIn: number
         dexes?: [IDex]
+        settings?: {
+            auto?: boolean
+        }
     }
 }
 

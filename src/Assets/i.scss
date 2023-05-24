@@ -385,7 +385,7 @@
 
                  .trade-amount,
                  .token-info {
-                     font-size: 12px;
+                     font-size: 10px;
                      font-weight: 400;
                      text-transform: uppercase;
                      font-family: var(--font-family-sans-serif);
@@ -840,6 +840,10 @@
      border-radius: 20px;
      padding: 1rem;
      flex-grow: 1;
+
+     &.transparent {
+         background: transparent !important;
+     }
  }
 
  .flexed-dash {
@@ -862,8 +866,6 @@
      background: var(--box-background-color);
      box-shadow: 0 0 1px inset rgba(0, 0, 0, 0.3);
 
-
-
      &.sticky-top {
          border-radius: 5px;
 
@@ -877,12 +879,12 @@
  .arbitrage-route {
      border-radius: 15px;
      padding: 1rem;
-     margin-block: 1rem;
+     margin-bottom: 1rem;
  }
 
  .arb-summary {
      width: 100%;
-     // background: red;
+    //  background: red;
  }
 
  .summary-container {
@@ -1087,6 +1089,11 @@
      opacity: .6;
      background: var(--body-background-color);
      color: white !important;
+
+     &.styled-input {
+         border-radius: 5px;
+         background: var(--box-background-color);
+     }
  }
 
  .top-level-three {
@@ -1547,6 +1554,7 @@
      backdrop-filter: blur(0.1px) grayscale(1);
      -webkit-backdrop-filter: blur(0.1px) grayscale(1);
      padding: 1rem;
+     padding-left: calc(55px + 1rem);
 
      .container {
          overflow: auto;
@@ -1555,7 +1563,7 @@
          max-height: 90dvh;
          background: linear-gradient(to top right, var(--box-background-color), var(--box-background-color));
          border-radius: 10px;
-         margin: auto;
+         margin-top: auto;
          margin-bottom: 0;
 
          &::-webkit-scrollbar {
@@ -1728,6 +1736,7 @@
      .content-modal-mail {
          left: 0;
          padding: 0;
+         padding-left: 0;
 
          .container {
              width: 100%;

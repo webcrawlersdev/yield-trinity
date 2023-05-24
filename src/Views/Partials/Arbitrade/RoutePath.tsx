@@ -34,8 +34,10 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
         abi: PRICE_ORACLE,
         address: ADDR['PRICE_ORACLEA'] as any,
         args: [[dex?.ROUTER], [], toWei(
-            dexId === 0 ? params?.arbitrade?.amountIn : params?.arbitrade?.dexes?.[dexId - 1]?.output)
-        ],
+            dexId === 0 ? params?.arbitrade?.amountIn : params?.arbitrade?.dexes?.[dexId - 1]?.output ,
+            dexId === 0 ? params?.arbitrade?.dexes?.[0]?.paths?.[0]?.decimals :
+                params?.arbitrade?.dexes?.[dexId - 1]?.paths?.[params?.arbitrade?.dexes?.[dexId - 1]?.paths?.length - 1]?.decimals
+        )],
     }
 
     dex?.paths?.map((token, index) => {
@@ -45,26 +47,26 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
         return target
     })
 
-    const { data, error, isLoading, refetch, status } = useContractRead({
+    const { data, error, isLoading, refetch, status, isError } = useContractRead({
         ...target,
         watch: true,
         cacheTime: 0,
         staleTime: 0,
+        enabled: true
     })
 
     useEffect(() => {
-        if (!data) {
+        if (!data || isError) {
             handleOutputUpdateForDex(dexId, fmWei(0))
             !isLoading || refetch()
         }
         else
-            handleOutputUpdateForDex(dexId, fmWei(data as any ?? 0))
-    }, [data, error, status])
+            handleOutputUpdateForDex(dexId, fmWei(data as any ?? 0, params?.arbitrade?.dexes?.[dexId - 1]?.paths?.[params?.arbitrade?.dexes?.[dexId - 1]?.paths?.length - 1]?.decimals))
+    }, [data, error, status, isError])
 
 
-    const RoutePath = <div className="trade-path" key={Math.random()}>
+    return <div className="trade-path" key={Math.random()}>
         <div className="dex-name">{dex?.NAME}</div>
-        <br />
         <div className="trade-paths space-between">
             {
                 dex?.paths?.map((path: any, index: number) => {
@@ -96,5 +98,4 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
         </div>
     </div>
 
-    return RoutePath
 }

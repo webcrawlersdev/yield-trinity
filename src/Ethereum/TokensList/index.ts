@@ -10,15 +10,15 @@ const ETH_MAINNET = [
         "name": "Tether USD",
         "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
         "symbol": "USDT",
-        "decimals": 6, 
+        "decimals": 6,
         "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png",
     }
 ]
 
 const POLYGON_MAINNET = [
-    { "address": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", "name": "Tether USD (POS)", "symbol": "USDT", "decimals": 18, "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg" },
+    { "address": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", "name": "Tether USD (POS)", "symbol": "USDT", "decimals": 6, "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg" },
     { "address": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", "name": "Dai Stablecoin (PoS)", "symbol": "DAI", "decimals": 18, "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_DAI.svg" },
-    { "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", "name": "USD Coin (PoS)", "symbol": "USDC", "decimals": 18, "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg" },
+    { "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", "name": "USD Coin (PoS)", "symbol": "USDC", "decimals": 6, "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg" },
     {
         "address": "0x831753DD7087CaC61aB5644b308642cc1c33Dc13",
         "name": "Quickswap",
@@ -39,20 +39,6 @@ const POLYGON_MAINNET = [
         "symbol": "WMATIC",
         "decimals": 18,
         "logoURI": "https://assets.coingecko.com/coins/images/4713/thumb/matic-token-icon.png?1624446912",
-    },
-    {
-        "address": "0xDA537104D6A5edd53c6fBba9A898708E465260b6",
-        "name": "yearn finance",
-        "symbol": "YFI",
-        "decimals": 18,
-        "logoURI": "https://assets.coingecko.com/coins/images/11849/thumb/yfi-192x192.png?1598325330",
-    },
-    {
-        "address": "0xb8cb8a7F4C2885C03e57E973C74827909Fdc2032",
-        "name": "DFI money",
-        "symbol": "YFII",
-        "decimals": 18,
-        "logoURI": "https://assets.coingecko.com/coins/images/11902/thumb/YFII-logo.78631676.png?1598677348",
     },
     {
         "address": "0xB7b31a6BC18e48888545CE79e83E06003bE70930",
@@ -86,7 +72,7 @@ const BSC_MAINNET = [
         "logoURI": "https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/smartchain/assets/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c/logo.png"
     },
     { "address": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", "name": "USDC Token", "symbol": "USDC", "decimals": 18, "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg" },
-    { "address": "0x55d398326f99059fF775485246999027B3197955", "name": "BUSD Token", "symbol": "BUSD", "decimals": 18, "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg" },
+    { "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", "name": "BUSD Token", "symbol": "BUSD", "decimals": 18, "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg" },
     {
         "address": "0xfb6115445Bff7b52FeB98650C87f44907E58f802",
         "name": "Aave",
