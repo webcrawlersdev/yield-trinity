@@ -100,6 +100,7 @@ export default function Arbitrage() {
         }
     }, [signerMessage?.data, signerMessage?.isSuccess])
 
+    
     const handleUseAuto = () => {
         if (arbSettings?.auto) return setParams('settings', { ...arbSettings, auto: false })
 
@@ -108,12 +109,11 @@ export default function Arbitrage() {
         })
     }
 
-
     return (
         <Master>
             <Grid className="dash relative" style={{ maxHeight: '100%' }}>
                 <Box className='space-between' style={{ width: '100%' }}>
-                    <Box className="dash-lin-box  transparent padding-none" style={{ boxShadow: 'none' }}>
+                    <Box className="dash-lin-box  transparent padding-none" style={{ boxShadow: 'none', borderRadius:0 }}>
                         {/* ROUTE BUILDER FOR PATH */}
                         <div className="space-between" style={{ width: '100%', }}>
                             <div className="space-between">
@@ -146,9 +146,9 @@ export default function Arbitrage() {
                             Balance {params?.arbitrade?.dexes?.[0]?.paths?.[0]?.symbol}&nbsp;{precise(frombalance?.data?.formatted ?? 0, 10)}
                         </small>
                     </Box>
-                    <Box className="dash-main-box box-stats sticky-top"></Box>
+                    <Box className="dash-main-box box-stats transparent sticky-top"></Box>
                 </Box>
-                <Box className="dash-lin-box sticky-top transparent padding-none" style={{ boxShadow: 'none' }}>
+                <Box className="dash-lin-box sticky-top transparent padding-none" style={{ boxShadow: 'none', borderRadius: 0 }}>
                     {
                         params?.arbitrade?.dexes?.map((a: any, index: any) => {
                             return <ArbitradeRouteBuilder
@@ -166,12 +166,12 @@ export default function Arbitrage() {
                 </Box>
                 {/* TRADE ROUTES */}
                 <Box className="dash-main-box box-stats sticky-top" style={{ background: 'transparent', padding: 0 }}>
-                    <div className="space-between">
+                    {/* <div className="space-between">
                         <h3 className="headline-3 space-between" style={{ gap: '.3rem' }}>
                             <Route />Routes 🤚
                         </h3>
                         <span></span>
-                    </div>
+                    </div> */}
                     <div className="trade-routes">
                         {
                             params?.arbitrade?.dexes?.map((dex, index: number) => {
@@ -197,6 +197,7 @@ export default function Arbitrage() {
                 toggle={setisShowingSettings}
                 setparams={setParams}
             />
+           
             <TokensList
                 shown={showTokens}
                 toggle={setShowTokens}

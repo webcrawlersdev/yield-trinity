@@ -114,13 +114,6 @@ const BSC_TESTNET = {
     DEXS: [
         {
             ROUTER: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
-            FACTORY: "",
-            ICON: UniswapIcons,
-            NAME: 'uniswap',
-            SYMBOL: 'UNI'
-        },
-        {
-            ROUTER: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
             FACTORY: "0xc35DADB65012eC5796536bD9864eD8773aBc74C4",
             ICON: UniswapIcons,
             NAME: 'uniswap',

@@ -1,22 +1,11 @@
 import { CancelPresentation } from "@mui/icons-material";
 import ContentModal from "../../../Components/Modal";
-import { ISnipperParams } from "../../Snipper";
-import { IArbitrade, IParams, Params } from '../../../Defaulds'
+import { IArbitrade, IArbitradeSettings, IParams, ISnipperSettings, Params } from '../../../Defaulds'
 import { Button, Checkbox, FormControlLabel, Input, Switch } from "@mui/material";
 import { useLocalStorage } from "usehooks-ts";
 import { notify } from "../../../Helpers";
 
-export interface ISwipperSettings {
-    shown: boolean,
-    toggle: ISnipperParams['settings'],
-    setparams: IArbitrade['setparams']
-}
-
-const toggleAutoBuy = () => { }
-const toggleAutoSell = () => { }
-
-
-export default function ArbitrageSettings(props: ISwipperSettings) {
+export default function ArbitrageSettings(props: IArbitradeSettings) {
     const { shown, toggle, setparams } = props
     const [params, setParams] = useLocalStorage<IParams>('@Params', Params)
 

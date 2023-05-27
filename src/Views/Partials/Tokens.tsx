@@ -1,10 +1,9 @@
 import { CancelPresentation } from "@mui/icons-material";
 import ContentModal from "../../Components/Modal";
-import { ISnipperParams } from "../Snipper";
 import { useADDR } from "../../Ethereum/Addresses";
 import { Button, Checkbox } from "@mui/material";
 import { useLocalStorage } from "usehooks-ts";
-import { IParams, ITokenInfo, Params } from "../../Defaulds";
+import { IParams, ISnipperParams, ITokenInfo, Params } from "../../Defaulds";
 
 export interface ITokensList {
     shown: boolean,

@@ -1,6 +1,6 @@
 import { Add, ArrowDownward, ArrowDropDown, ArrowRight, SwapHorizRounded } from '@mui/icons-material'
 import { Box, Button, Divider } from '@mui/material/'
-import { useNetwork, useContractReads, useContractRead } from 'wagmi'
+import { useNetwork, useContractRead } from 'wagmi'
 import useWindowDimensions from '../../Hooks/useWindowDimensions'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useADDR } from '../../Ethereum/Addresses'
@@ -17,7 +17,7 @@ export default () => {
     const ADDR = useADDR(chain?.id);
 
     const dex = (ADDR?.DEXS as any)?.filter((d: any) => d?.NAME?.includes((q.get('dex') as any)?.toLowerCase()?.replace(/[^a-zA-Z]+/g, '')))[0]
-   
+
     const handleNewDexSelected = (dexname: string) => {
         setSDxs(false)
         setSearchParams({ page: q.get('page') as any, dex: dexname })

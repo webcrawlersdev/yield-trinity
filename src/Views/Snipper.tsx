@@ -6,12 +6,6 @@ import { Params, IParams } from "../Defaulds";
 import SnipperSettings from "./Partials/Snipper/SnipperSettings";
 import DexChanges from "./Partials/DexChanges";
 
-export interface ISnipperParams {
-    setparams(key: IParams['snipper']['keys'], val: any): void
-    settings(old: (state: boolean) => boolean): void
-    dexes(old: (state: boolean) => boolean): void,
-}
-
 export default function Snipper() {
     const [showSnipperSettings, setShowSnipperSettings] = useState<boolean>(false)
     const [showDexes, setShowDexes] = useState(false)
@@ -37,12 +31,16 @@ export default function Snipper() {
             shown={showSnipperSettings}
             toggle={setShowSnipperSettings}
             setparams={setsnipperconfigs}
+            selected={null}
+            onSelect={() => Boolean}
         />
+
         <DexChanges
             shown={showDexes}
             selected={params?.snipper?.dex}
             onSelect={handleNewDexSelected}
             toggle={setShowDexes}
         />
+
     </Master>
 }

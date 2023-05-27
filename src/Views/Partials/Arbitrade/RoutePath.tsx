@@ -34,7 +34,7 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
         abi: PRICE_ORACLE,
         address: ADDR['PRICE_ORACLEA'] as any,
         args: [[dex?.ROUTER], [], toWei(
-            dexId === 0 ? params?.arbitrade?.amountIn : params?.arbitrade?.dexes?.[dexId - 1]?.output ,
+            dexId === 0 ? params?.arbitrade?.amountIn : precise(params?.arbitrade?.dexes?.[dexId - 1]?.output || 0, 8),
             dexId === 0 ? params?.arbitrade?.dexes?.[0]?.paths?.[0]?.decimals :
                 params?.arbitrade?.dexes?.[dexId - 1]?.paths?.[params?.arbitrade?.dexes?.[dexId - 1]?.paths?.length - 1]?.decimals
         )],

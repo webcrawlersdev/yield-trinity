@@ -1,25 +1,17 @@
 import { CloseRounded } from "@mui/icons-material";
 import ContentModal from "../../Components/Modal";
-import { ISnipperParams } from "../Snipper";
-import { IParams, Params } from '../../Defaulds'
+import { ISettings } from '../../Defaulds'
 import { useNetwork } from "wagmi";
 import { useADDR } from "../../Ethereum/Addresses";
 import { Button } from "@mui/material";
 
-export interface ISwipperSettings {
-    shown: boolean,
-    selected: any,
-    toggle: ISnipperParams['settings'],
-    onSelect(dexname: string): void
-}
-
-export default function DexChanges(props: ISwipperSettings) {
+export default function DexChanges(props: ISettings) {
     const { shown, toggle, onSelect, selected } = props
     const { chain } = useNetwork()
     const ADDR = useADDR(chain?.id);
 
     return (
-        <ContentModal shown={shown} onModalClose={() => toggle(s => false)}>
+        <ContentModal shown={shown} onModalClose={() => toggle(s => false)} position="left">
             <div className="modal-heading space-between">
                 <h3 className="modal-headline">select a dexchange</h3> <CloseRounded className="close-btn" onClick={() => toggle(s => !s)} />
             </div>

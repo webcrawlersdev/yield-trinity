@@ -1,7 +1,7 @@
 import { Add, ArrowRight, CurrencyExchange } from "@mui/icons-material";
 import { Button, CircularProgress, Box, Grid } from "@mui/material";
 import { useLocalStorage } from "usehooks-ts";
-import { Params, IParams, IArbitradeRouteBuilder, IContractRead, IDex, ITokenInfo } from "../../../Defaulds";
+import { Params, IParams, IArbitradeRouteBuilder, IContractRead, IDex, ITokenInfo, IMultiPathTranactionBuillder } from "../../../Defaulds";
 import { useEffect, useState } from "react";
 import { usePrepareContractWrite, useNetwork, useWaitForTransaction, useContractWrite, useAccount, useContractRead, useProvider, useSigner, useSignMessage } from "wagmi";
 import { PRICE_ORACLE } from "../../../Ethereum/ABIs/index.ts"
@@ -12,14 +12,6 @@ import { toast } from 'react-toastify'
 import { ethers } from "ethers";
 import { motion } from 'framer-motion'
 
-export interface ITranactionBuillder {
-    _paths: string[]
-    _pathLengths: number[]
-    _routes: string[]
-    _inputes: number[]
-    _minOutputs: number[]
-    _deadline: number
-}
 
 export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['onShowDexes'] }) {
 
@@ -34,10 +26,9 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
         chainId: chain?.id,
     })
 
-
     const Builder = {
         _paths: [], _pathLengths: [], _routes: [], _inputes: [], _minOutputs: [], _deadline: 100,
-    } as ITranactionBuillder
+    } as IMultiPathTranactionBuillder
 
     const Transactable = arbitrade?.dexes?.map((dex, index: number) => {
         Builder['_paths'].push(...(dex?.paths?.map(path => path?.address) || []))
@@ -68,8 +59,6 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
             Number(arbitrade?.dexes?.[arbitrade?.dexes?.length - 1]?.paths?.length) > 1),
         staleTime: 0
     })
-
-    const { } = useContractRead({})
 
     const sendSwap = useContractWrite(prepareSwap?.config)
 
@@ -190,8 +179,6 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
         }
 
     }, [arbitrade?.settings?.auto, signer?.data, sendSwap?.isLoading])
-
-    console.log(ReqOutput, " RED")
 
     const manualSigningPanel = (
         <motion.div

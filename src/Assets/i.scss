@@ -258,18 +258,21 @@
  }
 
  .drop-down-wrapper {
-     border-radius: 50px;
+     border-radius: 6px;
      position: relative;
+     width: 100%;
+     background: var(--body-background-color);
 
      .drop-down-items {
-         position: absolute;
-         top: 110%;
-         left: 0;
+        //  position: absolute;
+        //  top: 110%;
+        //  left: 0;
+        // margin-top: .5rem;
          padding: .6rem;
-         background: linear-gradient(230deg, white, whitesmoke);
+        //  background: linear-gradient(230deg, white, whitesmoke);
          border-radius: 6px;
          box-shadow: 0 8px 5px -6px rgba(0, 0, 0, 0.8), 0 0 1px rgba(0, 0, 0, 0.3);
-         min-width: 140%;
+        //  min-width: 140%;
      }
  }
 
@@ -310,6 +313,15 @@
      justify-content: center;
      gap: .7rem;
      text-transform: uppercase;
+ }
+
+ .output-values {
+     font-size: 12px !important;
+     font-weight: 400;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     gap: .2rem;
  }
 
  .token-icon-wrap {
@@ -884,7 +896,7 @@
 
  .arb-summary {
      width: 100%;
-    //  background: red;
+     //  background: red;
  }
 
  .summary-container {
@@ -1362,8 +1374,9 @@
  .drop-down-btn {
      font-size: 11px !important;
      text-transform: capitalize !important;
-     font-weight: 600;
+     font-weight: 500;
      text-align: left !important;
+     width: 100% !important;
  }
 
  .margin-bottom-sp {

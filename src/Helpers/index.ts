@@ -1,15 +1,37 @@
 import { ethers } from 'ethers'
 
+
+// precising/to fixed decimals places  
 export const precise = (val: string | number, decimals: undefined | number = 4): string => Number(val).toFixed(decimals)
+
+// is a valid address
 export const isAddress = (val: string) => ethers.utils.isAddress(String(val))
+
+// to uppercase
 export const toUpper = (val: any) => String(String(val)?.toUpperCase())
+
+// to lowecasse
 export const toLower = (val: string) => String(val?.toLowerCase())
+
+// is equal
 export const strEqual = (val: string | undefined, val1: string | undefined): boolean => toUpper(val) === toUpper(val1)
+
+// wait/sleep
 export const wait = /*@devfred*/ async (seconds?: number) => new Promise((resolved) => setTimeout(() => resolved('continue'), Number(seconds) * 1000 || 1000))
+
+// to big number
 export const toBN = (val: string | number): ethers.BigNumber => ethers.BigNumber.from(val)
+
+// fromart numbers in k`s
 export const fmtNumCompact = (val: number | string): string => Intl.NumberFormat("en", { notation: "compact" }).format(Number(val))
+
+// percentage of off
 export const percentageof = (perc: number | string, num: number | string): number => Number(num) * (Number(perc) / 100)
+ 
+// subtraction
 export const sub = (val: number | string, val1: number | string): number => Number(val) - Number(val1)
+
+// cut
 export const cut = (val: string | number | unknown, position: "middle" | "left" | "right" | undefined = "middle") => {
     const valz = String(val)
     switch (position) {
@@ -24,11 +46,14 @@ export const cut = (val: string | number | unknown, position: "middle" | "left" 
     }
 }
 
+
+// from wei
 export const fmWei = (val: string | number, decimals: undefined | string | number = 18): string => {
     if (!val) return precise(0)
     return ethers.utils.formatUnits(String(val), decimals)
 }
 
+// to wei
 export const toWei = (val: string | number, decimals: any = 18): ethers.BigNumber | number => {
     if (!val || !decimals) return ethers.utils.parseUnits(String(0), 18)
     return ethers.utils.parseUnits(String(val), decimals)
@@ -39,6 +64,8 @@ export const encodeFunctionCall = (funcName: string, abi: any, params: any): any
     return new ethers.utils.Interface(abi).encodeFunctionData(funcName, params);
 }
 
+
+// price difference
 export const priceDifference = (val: string | number, val2: string | number): { subtract: any, percentage: any } => {
     const oldp = Number(val)
     const newp = Number(val2)
@@ -74,4 +101,8 @@ export const notify = () => {
     // At last, if the user has denied notifications, and you
     // want to be respectful there is no need to bother them anymore.
 }
+
+
+//
+
 

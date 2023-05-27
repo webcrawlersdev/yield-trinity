@@ -2,7 +2,7 @@ import { Button } from '@mui/material'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 
-export default function DropDown({ children, title,  }: { children?: React.ReactNode, title?: string }) {
+export default function DropDown({ children, title, }: { children?: React.ReactNode, title?: React.ReactNode }) {
     const [shown, setshown] = useState<boolean>(false)
     const dropDownIteVariant = {
         opened: { y: 0, display: 'block' },
@@ -23,7 +23,7 @@ export default function DropDown({ children, title,  }: { children?: React.React
     return (
         <div className="drop-down-wrapper">
             <div className="space-between">
-                <Button className='primary-button drop-down-btn' onClick={() => setshown(state => !state)} variant='outlined'>
+                <Button className='primary-button drop-down-btn' onClick={() => setshown(state => !state)} variant='text'>
                     {title}
                     {/* <ArrowDownward /> */}
                 </Button>
