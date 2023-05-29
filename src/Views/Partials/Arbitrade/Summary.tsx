@@ -3,7 +3,7 @@ import { Button, CircularProgress, Box, Grid } from "@mui/material";
 import { useLocalStorage } from "usehooks-ts";
 import { Params, IParams, IArbitradeRouteBuilder, IContractRead, IDex, ITokenInfo, IMultiPathTranactionBuillder } from "../../../Defaulds";
 import { useEffect, useState } from "react";
-import { usePrepareContractWrite, useNetwork, useWaitForTransaction, useContractWrite, useAccount, useContractRead, useProvider, useSigner, useSignMessage } from "wagmi";
+import { usePrepareContractWrite, useNetwork, useWaitForTransaction, useContractWrite, useAccount, useContractRead, useProvider, useSigner, useSignMessage, useBalance } from "wagmi";
 import { PRICE_ORACLE } from "../../../Ethereum/ABIs/index.ts"
 import { useADDR } from "../../../Ethereum/Addresses";
 import { fmWei, toWei, strEqual, precise, sub } from "../../../Helpers";
@@ -26,6 +26,12 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
         chainId: chain?.id,
     })
 
+    const fromBalance = useBalance({
+        address,
+        enabled: Boolean(address && arbitrade?.dexes?.[0]?.paths?.[0]?.address),
+        token: arbitrade?.dexes?.[0]?.paths?.[0]?.address as any
+    })
+
     const Builder = {
         _paths: [], _pathLengths: [], _routes: [], _inputes: [], _minOutputs: [], _deadline: 100,
     } as IMultiPathTranactionBuillder
@@ -33,7 +39,7 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
     const Transactable = arbitrade?.dexes?.map((dex, index: number) => {
         Builder['_paths'].push(...(dex?.paths?.map(path => path?.address) || []))
         Builder['_pathLengths'].push(dex?.paths?.length)
-        Builder['_routes'].push(dex.ROUTER)
+        Builder['_routes'].push(dex.router)
         Builder['_inputes'].push(toWei(index === 0 ? arbitrade?.amountIn : arbitrade?.dexes?.[index - 1]?.output) as number)
         Builder['_minOutputs'].push(toWei(arbitrade?.dexes?.[index]?.output) as number)
         Builder['_deadline'] = 20 // in seconds, contract has the current timestamp
@@ -55,8 +61,10 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
                     chain?.nativeCurrency?.symbol?.slice(-3)) ? toWei(arbitrade?.amountIn, arbitrade?.dexes?.[0]?.paths?.[0]?.decimals) : 0
         },
         cacheTime: 0,
-        enabled: Boolean(Number(arbitrade?.dexes?.[0]?.paths?.length) > 1 &&
-            Number(arbitrade?.dexes?.[arbitrade?.dexes?.length - 1]?.paths?.length) > 1),
+        enabled:
+            Boolean(Number(arbitrade?.dexes?.[0]?.paths?.length) > 1 &&
+                Number(arbitrade?.dexes?.[arbitrade?.dexes?.length - 1]?.paths?.length) > 1) &&
+            Boolean(Number(fromBalance?.data?.formatted) >= Number(arbitrade?.amountIn) && Number(arbitrade?.amountIn) > 0),
         staleTime: 0
     })
 
@@ -102,7 +110,7 @@ export default function Summary(props: { onShowDexes: IArbitradeRouteBuilder['on
         functionName: "getRouteOutputs",
         abi: PRICE_ORACLE,
         // address: ADDR['PRICE_ORACLEA'] as any,
-        // args: [[arbitrade?.dexes?.[arbitrade?.dexes?.length - 1]?.ROUTER],
+        // args: [[arbitrade?.dexes?.[arbitrade?.dexes?.length - 1]?.router],
         // arbitrade?.dexes?.[arbitrade?.dexes?.length - 1]?.paths?.map((p: ITokenInfo) => p?.address)?.reverse() || [],
         //     toWei(arbitrade?.dexes?.[arbitrade?.dexes?.length - 1]?.output ?? arbitrade?.dexes?.[0]?.output,
         //     arbitrade?.dexes?.[arbitrade?.dexes?.length - 1]?.paths?.[arbitrade?.dexes?.[arbitrade?.dexes?.length - 1]?.paths.length - 1]?.decimals

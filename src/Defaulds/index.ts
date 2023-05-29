@@ -60,7 +60,7 @@ export interface ITokenInfo {
 }
 
 export interface IDex {
-    ROUTER: string
+    router: string
     FACTORY: string
     ICON: string
     NAME: string
@@ -78,7 +78,32 @@ export interface IMultiPathTranactionBuillder {
     _deadline: number
 }
 
-
+export interface IOpportunityCard {
+    paths: [ITokenInfo]
+    difference: {
+        potnetialProfit: number,
+        percentage: number
+    }
+    dex: {
+        router: string
+        factory: string
+        names: string
+    }
+    path: number
+    pathFiltered: string[]
+    pathName: string[]
+    amountIn: number
+    amountOut: number
+    chainId: number
+    createdAt: {
+        relative: string
+        absolute: Date
+    }
+    updatedAt: {
+        relative: string
+        absolute: Date
+    }
+}
 
 export interface IParams {
     snipper: {

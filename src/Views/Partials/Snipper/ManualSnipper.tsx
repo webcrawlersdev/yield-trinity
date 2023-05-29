@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react'
 import { cut, fmWei, isAddress, percentageof, precise, priceDifference, strEqual, sub, toBN, toUpper, toWei } from "../../../Helpers";
 import { motion } from 'framer-motion'
 import { PRICE_ORACLE } from '../../../Ethereum/ABIs/index.ts'
-import { fmtNumCompact } from "../../../Helpers";
+import { NumCompact } from "../../../Helpers";
 import { toast } from 'react-toastify'
 import useDecentralizedExchange from "../../../Hooks/useDecentralizedExchamge";
 import { useLocalStorage } from "usehooks-ts";
@@ -30,7 +30,7 @@ dayjs.extend(relativeTime)
 
 export default function ManualSnipper(props: ISnipperParams) {
     const { settings, setparams, dexes } = props
-    const { isConnected, address, } = useAccount()
+    const { isConnected, address } = useAccount()
     const { chain, } = useNetwork()
     const ADDR = useADDR(chain?.id);
     const ProviderInstance = useProvider()
@@ -54,14 +54,14 @@ export default function ManualSnipper(props: ISnipperParams) {
     const { data: token0 } = useToken({ address: (Pairs as any)?.[0] })
     const { data: token1 } = useToken({ address: (Pairs as any)?.[1] })
     const [selectedTrade, setSelectedTrade] = useState<any>({ tradeType: 'buy', tradeAmount: precise(Math.random() * 2), tokenInfo: token0 })
-    const { data: token0Balance } = useBalance({ address, token: token0?.address, watch: true })
-    const { data: token1Balance } = useBalance({ address, token: token1?.address, watch: true })
+    const { data: token0Balance } = useBalance({ address, token: token0?.address, watch: true, enabled: Boolean(address) })
+    const { data: token1Balance } = useBalance({ address, token: token1?.address, watch: true, enabled: Boolean(address) })
     const { data: token0InPool } = useBalance({ address: params?.snipper?.pair, token: token0?.address, watch: true })
     const { data: token1InPool } = useBalance({ address: params?.snipper?.pair, token: token1?.address, watch: true })
 
     const PriceOracleContracts = {
         abi: PRICE_ORACLE, address: ADDR['PRICE_ORACLEA'], functionName: "priceInToken",
-        args: [token0?.address, token1?.address, dex.ROUTER, dex.FACTORY],
+        args: [token0?.address, token1?.address, dex.router, dex.FACTORY],
         watch: true,
         enabled: Boolean(token0?.address && token1?.address)
     }
@@ -69,7 +69,7 @@ export default function ManualSnipper(props: ISnipperParams) {
     const { data: tokenPriceInToken, } = useContractRead(PriceOracleContracts)
 
     PriceOracleContracts.args = [
-        [dex.ROUTER],
+        [dex.router],
         (selectedTrade.tradeType === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
         toWei(Number(Number.isNaN(selectedTrade.tradeAmount) ? 0 : selectedTrade.tradeAmount), selectedTrade?.tokenInfo?.decimals)
     ]
@@ -80,6 +80,7 @@ export default function ManualSnipper(props: ISnipperParams) {
         functionName: 'allowance',
         args: [address, ADDR['PRICE_ORACLEA']],
         watch: true,
+        enabled: Boolean(address)
     })
 
     const priceImpact = useContractRead({
@@ -128,7 +129,7 @@ export default function ManualSnipper(props: ISnipperParams) {
             (selectedTrade.tradeType === 'sell') ? [token1?.address, token0?.address] : [token0?.address, token1?.address],
             toWei(selectedTrade?.tradeAmount, selectedTrade?.tokenInfo?.decimals),
             toWei(routeOutputs?.RoutOutputs, selectedTrade?.tokenInfo?.decimals),
-            dex.ROUTER,
+            dex.router,
             120
         ],
         overrides: {
@@ -248,10 +249,15 @@ export default function ManualSnipper(props: ISnipperParams) {
 
         return () => {
             (async () => {
-                const baseBalance = await ProviderInstance.getBalance(String(address));
-                setBaseTokenBalance(o => o = precise(fmWei(String(baseBalance))));
-                const poolTnxCount = await ProviderInstance.getTransactionCount(params?.snipper?.pair);
-                setSelectedPair(p => ({ ...p, transactionCount: Number(poolTnxCount) }));
+                if (Boolean(address)) {
+                    const baseBalance = await ProviderInstance.getBalance(String(address));
+                    setBaseTokenBalance(o => o = precise(fmWei(String(baseBalance))));
+                }
+                if (Boolean(params?.snipper?.pair)) {
+                    const poolTnxCount = await ProviderInstance.getTransactionCount(params?.snipper?.pair);
+                    setSelectedPair(p => ({ ...p, transactionCount: Number(poolTnxCount) }));
+                }
+
             })();
         }
     }, [tokenPriceInToken, token1, selectedTrade, tokenAllowance]);
@@ -273,7 +279,7 @@ export default function ManualSnipper(props: ISnipperParams) {
                 token0?.address as any
             ]
             Builder['_pathLengths'] = [2, 2]
-            Builder['_routes'] = [dex.ROUTER, dex.ROUTER]
+            Builder['_routes'] = [dex.router, dex.router]
             Builder['_inputes'] = [
                 strEqual(selectedTrade?.tokenInfo?.address, ADDR['WETH_ADDRESSA'])
                     ? toWei(selectedTrade?.tradeAmount) as number
@@ -288,7 +294,7 @@ export default function ManualSnipper(props: ISnipperParams) {
 
     }, [])
 
-    console.log(String(priceImpact?.data), "PRICE IMPACT!!!")
+    // console.log(String(priceImpact?.data), "PRICE IMPACT!!!")
 
     const DexSelector = <div className="space-between isolated-container" style={{ zIndex: 20 }}>
         <Button
@@ -323,7 +329,7 @@ export default function ManualSnipper(props: ISnipperParams) {
                                     color="inherit"
                                     size={10}
                                 /> :
-                                fmtNumCompact(routeOutputs?.FuturePrice)
+                                NumCompact(routeOutputs?.FuturePrice)
                             }
                         </span>
                     </div>
@@ -539,7 +545,7 @@ export default function ManualSnipper(props: ISnipperParams) {
                             <div className=" space-between" style={{ width: '100%' }}>
                                 <div className="trade-route " style={{ marginBottom: 0, justifyContent: 'left', gap: '.5rem' }}>
                                     <span className="output-values">
-                                        <span>{fmtNumCompact(selectedTrade?.tradeAmount)}</span>
+                                        <span>{NumCompact(selectedTrade?.tradeAmount)}</span>
                                         <span>{cut(selectedTrade.tradeType === 'sell' ? token1?.symbol : token0?.symbol, 'right')}</span>
                                     </span>
                                     =
@@ -549,7 +555,7 @@ export default function ManualSnipper(props: ISnipperParams) {
                                                 <CircularProgress
                                                     color="inherit"
                                                     size={10} /> :
-                                                <span>{precise(/*fmtNumCompact(*/routeOutputs?.RoutOutputs/*)*/, 6)}</span>
+                                                <span>{precise(/*NumCompact(*/routeOutputs?.RoutOutputs/*)*/, 6)}</span>
                                             }
                                         </span>
                                         <span>{cut(selectedTrade.tradeType === 'sell' ? token0?.symbol : token1?.symbol, 'right')}</span>

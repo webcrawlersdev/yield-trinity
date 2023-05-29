@@ -2,7 +2,11 @@ import { ethers } from 'ethers'
 
 
 // precising/to fixed decimals places  
-export const precise = (val: string | number, decimals: undefined | number = 4): string => Number(val).toFixed(decimals)
+export const precise = (val: string | number = 0, decimals: undefined | number = 4): string => {
+    let tofixed = Number(val ?? 0).toFixed(decimals + 1)
+    let splitted0 = String(tofixed).split('.')[1]
+    return tofixed.split('.')[0].concat('.').concat(splitted0.slice(0, decimals))
+}
 
 // is a valid address
 export const isAddress = (val: string) => ethers.utils.isAddress(String(val))
@@ -23,11 +27,11 @@ export const wait = /*@devfred*/ async (seconds?: number) => new Promise((resolv
 export const toBN = (val: string | number): ethers.BigNumber => ethers.BigNumber.from(val)
 
 // fromart numbers in k`s
-export const fmtNumCompact = (val: number | string): string => Intl.NumberFormat("en", { notation: "compact" }).format(Number(val))
+export const NumCompact = (val: number | string): string => Intl.NumberFormat("en", { notation: "compact" }).format(Number(val))
 
 // percentage of off
 export const percentageof = (perc: number | string, num: number | string): number => Number(num) * (Number(perc) / 100)
- 
+
 // subtraction
 export const sub = (val: number | string, val1: number | string): number => Number(val) - Number(val1)
 

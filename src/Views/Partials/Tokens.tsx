@@ -28,7 +28,7 @@ export function TokensList(props: ITokensList) {
                     return <Button
                         key={index + '-' + token.name}
                         onClick={() => onSelect(token, params?.arbitrade?.currentDexId, isChecked)}
-                        disabled={(selections?.length as number >= 4) && (!isChecked)}
+                        disabled={(selections?.length as number >= 5) && (!isChecked)}
                         style={{ padding: '.2rem', width: '100%', opacity: (token?.name?.includes(selected)) ? 0.2 : 1, color: 'white' }}
                         className={`flexed-tab capitalize ${!token?.name && 'error'}`}>
                         <div className="space-between" style={{ width: '100%' }}>

@@ -24,21 +24,21 @@ const ETH_MAINNET = {
     TOKENS: tokensList[1],
     DEXS: [
         {
-            ROUTER: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+            router: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
             FACTORY: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
             ICON: UniswapIcons,
             NAME: 'uniswap',
             SYMBOL: 'UNI'
         },
         {
-            ROUTER: "0xEfF92A263d31888d860bD50809A8D171709b7b1c",
+            router: "0xEfF92A263d31888d860bD50809A8D171709b7b1c",
             FACTORY: "0x1097053Fd2ea711dad45caCcc45EfF7548fCB362",
             ICON: PancakeSwapIcons,
             NAME: 'pancakeswap',
             SYMBOL: 'CAKE'
         },
         {
-            ROUTER: "0x5f509a3C3F16dF2Fba7bF84dEE1eFbce6BB85587",
+            router: "0x5f509a3C3F16dF2Fba7bF84dEE1eFbce6BB85587",
             FACTORY: "0xBAe5dc9B19004883d0377419FeF3c2C8832d7d7B",
             ICON: ApeSwapIcons,
             NAME: 'apeswap',
@@ -54,20 +54,20 @@ const POLYGON_MAINNET = {
     TOKENS: tokensList[137],
     DEXS: [
         {
-            ROUTER: "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
+            router: "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
             FACTORY: "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32",
             ICON: QuickswapIcons,
             NAME: 'quickswap',
             SYMBOL: 'quick'
         },
         {
-            ROUTER: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
+            router: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
             FACTORY: "0xc35DADB65012eC5796536bD9864eD8773aBc74C4",
             ICON: SushiSwapIcons,
             NAME: 'sushiswap',
             SYMBOL: 'sushi'
-        },   {
-            ROUTER: "0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607",
+        }, {
+            router: "0xC0788A3aD43d79aa53B09c2EaCc313A787d1d607",
             FACTORY: "0xCf083Be4164828f00cAE704EC15a36D711491284",
             ICON: ApeSwapIcons,
             NAME: 'apeswap',
@@ -83,21 +83,21 @@ const BSC_MAINNET = {
     TOKENS: tokensList[56],
     DEXS: [
         {
-            ROUTER: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
+            router: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
             FACTORY: "0xc35DADB65012eC5796536bD9864eD8773aBc74C4",
             ICON: SushiSwapIcons,
             NAME: 'sushiswap',
             SYMBOL: 'sushi'
         },
         {
-            ROUTER: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
+            router: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
             FACTORY: "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73",
             ICON: PancakeSwapIcons,
             NAME: 'pancakeswap',
             SYMBOL: 'cake'
         },
         {
-            ROUTER: "0xcF0feBd3f17CEf5b47b0cD257aCf6025c5BFf3b7",
+            router: "0xcf0febd3f17cef5b47b0cd257acf6025c5bff3b7",
             FACTORY: "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6",
             ICON: ApeSwapIcons,
             NAME: 'apeswap',
@@ -113,14 +113,14 @@ const BSC_TESTNET = {
     TOKENS: tokensList[97],
     DEXS: [
         {
-            ROUTER: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
+            router: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
             FACTORY: "0xc35DADB65012eC5796536bD9864eD8773aBc74C4",
             ICON: UniswapIcons,
             NAME: 'uniswap',
             SYMBOL: 'UNI'
         },
         {
-            ROUTER: "0x9ac64cc6e4415144c455bd8e4837fea55603e5c3",//0xD99D1c33F9fC3444f8101754aBC46c52416550D1
+            router: "0x9ac64cc6e4415144c455bd8e4837fea55603e5c3",//0xD99D1c33F9fC3444f8101754aBC46c52416550D1
             FACTORY: "0x6725f303b657a9451d8ba641348b6761a6cc7a17",
             ICON: PancakeSwapIcons,
             NAME: 'pancakeswap',

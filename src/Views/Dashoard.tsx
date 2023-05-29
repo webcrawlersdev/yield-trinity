@@ -1,7 +1,7 @@
 import Master from "../Layouts/Master"
 import { Grid, Box, Typography, Button, Divider, LinearProgress } from '@mui/material/'
 import { useNetwork, useContractReads, useContractRead, useProvider } from 'wagmi'
-import { fmWei, fmtNumCompact, precise } from "../Helpers"
+import { fmWei, NumCompact, precise } from "../Helpers"
 import { SHARED_WALLET as SABI, PRICE_ORACLE as PABI } from "../Ethereum/ABIs/index.ts"
 import { useADDR } from "../Ethereum/Addresses"
 import { useEffect, useState } from "react"
@@ -146,10 +146,10 @@ export default () => {
 
                                     <div className="space-between">
                                         <span className="usd-price" >
-                                            {chain?.nativeCurrency?.symbol} {fmtNumCompact(precise(fmWei((trackingNewPair?.data as any)?.[0]?.[0]), 10))}
+                                            {chain?.nativeCurrency?.symbol} {NumCompact(precise(fmWei((trackingNewPair?.data as any)?.[0]?.[0]), 10))}
                                         </span>
                                         <span className="usd-price" >
-                                            {(tokenInfo as any)?.[2]} {fmtNumCompact(precise(fmWei((trackingNewPair?.data as any)?.[0]?.[1])))}
+                                            {(tokenInfo as any)?.[2]} {NumCompact(precise(fmWei((trackingNewPair?.data as any)?.[0]?.[1])))}
                                         </span>
                                     </div>
                                 </div>

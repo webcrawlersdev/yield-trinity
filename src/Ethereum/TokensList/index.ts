@@ -54,14 +54,14 @@ const BSC_MAINNET = [
         "name": "BTCB",
         "address": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
         "symbol": "BTCB",
-        "decimals": 8,
+        "decimals": 18,
         "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png",
     },
     {
         "name": "Tether USD",
         "address": "0x55d398326f99059fF775485246999027B3197955",
         "symbol": "USDT",
-        "decimals": 6,
+        "decimals": 18,
         "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png",
     },
     {

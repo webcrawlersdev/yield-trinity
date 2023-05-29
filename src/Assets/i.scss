@@ -12,6 +12,7 @@
      --box-gradient: linear-gradient(135deg, var(--ifm-box-bg-color) 0, #0000 100%);
      --font-family-sans-serif: "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
      --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+     --start-bg-dotted: radial-gradient(var(--box-background-color) .3%, transparent 2%), radial-gradient(#fafafa .7%, transparent 1%);
  }
 
  body,
@@ -73,8 +74,7 @@
      isolation: isolate;
      overflow: hidden;
      overflow-y: auto;
-     background-image: radial-gradient(var(--box-background-color) .3%, transparent 2%),
-         radial-gradient(#fafafa .7%, transparent 1%);
+     background-image: var(--start-bg-dotted);
      background-color: var(--body-background-color);
      background-position: 0 0, 50px 50px;
      background-size: 100px 100px;
@@ -264,15 +264,15 @@
      background: var(--body-background-color);
 
      .drop-down-items {
-        //  position: absolute;
-        //  top: 110%;
-        //  left: 0;
-        // margin-top: .5rem;
+         //  position: absolute;
+         //  top: 110%;
+         //  left: 0;
+         // margin-top: .5rem;
          padding: .6rem;
-        //  background: linear-gradient(230deg, white, whitesmoke);
+         //  background: linear-gradient(230deg, white, whitesmoke);
          border-radius: 6px;
          box-shadow: 0 8px 5px -6px rgba(0, 0, 0, 0.8), 0 0 1px rgba(0, 0, 0, 0.3);
-        //  min-width: 140%;
+         //  min-width: 140%;
      }
  }
 
@@ -328,14 +328,16 @@
      padding: .06rem;
      z-index: 1;
 
-     .token-icon {
-         width: 23px;
-         padding: .1rem;
-         border-radius: 50px;
-         aspect-ratio: 1/1;
-         background: var(--body-background-color);
-     }
 
+
+ }
+
+ .token-icon {
+     width: 23px;
+     padding: .1rem;
+     border-radius: 50px;
+     aspect-ratio: 1/1;
+     background: var(--body-background-color);
  }
 
  .tokens-path-is {
@@ -842,6 +844,122 @@
          display: none;
      }
  }
+
+ .discover-cards-master {
+     gap: 1rem;
+     width: 100dvw;
+     display: flex;
+     flex-wrap: wrap;
+     justify-content: space-between;
+     height: max-content;
+     overflow: hidden;
+
+     .discover-card {
+         width: clamp(calc(20% - 1rem), 230px, 100dvw);
+         border-radius: 12px;
+         background: var(--box-background-color);
+         padding: .5rem;
+         max-width: 100%;
+         // height: 230px;
+         overflow: hidden;
+         flex-grow: 1;
+         display: flex;
+         flex-direction: column;
+         align-content: space-between;
+         justify-content: space-between;
+         gap: .6rem;
+         position: relative;
+         isolation: isolate;
+         box-shadow: 0 0 1px inset rgb(110, 110, 110);
+
+         &::after {
+             position: absolute;
+             right: .6rem;
+             top: .6rem;
+             padding: 4px;
+             background: green;
+             border-radius: 50px;
+             content: '';
+             z-index: -2;
+             box-shadow: 0 0 5px rgb(25, 227, 3), 0 0 10px rgb(3, 227, 223);
+         }
+
+         &.yellow::after {
+             background: yellow;
+             box-shadow: 0 0 5px rgb(227, 216, 3), 0 0 10px rgb(172, 190, 6);
+         }
+
+         &.red::after {
+             background: red;
+             box-shadow: 0 0 5px rgb(227, 3, 3), 0 0 10px rgb(185, 42, 42);
+         }
+
+         &::before {
+             position: absolute;
+             right: 1rem;
+             top: 0;
+             padding: 4px;
+             padding-left: 1.8rem;
+             width: 100px;
+             content: attr(data-percentage);
+             z-index: -2;
+             display: flex;
+             align-items: center;
+             font-size: 12px;
+             justify-content: center;
+             transform: rotate(45deg);
+             border-radius: 50px;
+             text-shadow: 0 0 10px rgba(8, 166, 198, 0.827);
+             box-shadow: 0 0 1px inset rgb(110, 110, 110);
+             background-color: var(--body-background-color);
+             background-image: var(--start-bg-dotted);
+         }
+     }
+ }
+
+ .discover-trade-amount-info-route {
+     width: clamp(100%, 100%, 100%);
+     display: flex;
+     flex-wrap: wrap;
+     align-items: center;
+     justify-content: space-between;
+     background: var(--body-background-color);
+     border-radius: 50px;
+     padding: .3rem;
+
+     .swap-icon {
+        //  background: green;
+         border-radius: 50px;
+         padding: .1rem;
+         //  font-size: 15px;
+     }
+
+     .trade-path-flow {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         background: rgb(30, 30, 30);
+         border-radius: 50px;
+         gap: .3rem;
+         width: max-content;
+
+         &:nth-of-type(1){
+            // background: blue;
+         }
+
+         .trade-amount{
+            font-size: 11px;
+            margin-right: .3rem;
+            font-weight: 400;
+         }
+
+         .token-icon {
+             width:30px;
+             border-radius: 50px;
+         }
+     }
+ }
+
 
  .dash-main-box,
  .flexed-dash {

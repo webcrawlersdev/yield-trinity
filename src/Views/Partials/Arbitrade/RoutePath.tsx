@@ -12,48 +12,48 @@ export const RoutePathOutput = () => {
 }
 
 export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) {
+
     const { dex, dexId } = props
     const { chain } = useNetwork()
     const ADDR = useADDR(chain?.id)
-    const [params, storeParams] = useLocalStorage<IParams>('@Params', Params)
+    const [{ arbitrade }, storeParams] = useLocalStorage<IParams>('@Params', Params)
 
-    const setParams = (key: IParams['arbitrade']['keys'], val: any) =>
-        storeParams(o => o = { ...o, arbitrade: { ...o.arbitrade, [key]: val } })
+    const setParams = (key: IParams['arbitrade']['keys'], val: any) => storeParams(o => o = {
+        ...o, arbitrade: { ...o.arbitrade, [key]: val }
+    })
 
     const handleOutputUpdateForDex = async (dexId: any, output: any) => {
-        const modified = params?.arbitrade?.dexes?.map((dex, index) => {
-            if (index === dexId)
-                dex['output'] = output
+        const modified = arbitrade?.dexes?.map((dex, index) => {
+            if (index === dexId) dex['output'] = output;
             return dex
         })
         setParams('dexes', modified)
     }
 
     const target: IContractRead = {
-        functionName: "getRouteOutputs",
+        functionName: "_getRouteOutput",
         abi: PRICE_ORACLE,
         address: ADDR['PRICE_ORACLEA'] as any,
-        args: [[dex?.ROUTER], [], toWei(
-            dexId === 0 ? params?.arbitrade?.amountIn : precise(params?.arbitrade?.dexes?.[dexId - 1]?.output || 0, 8),
-            dexId === 0 ? params?.arbitrade?.dexes?.[0]?.paths?.[0]?.decimals :
-                params?.arbitrade?.dexes?.[dexId - 1]?.paths?.[params?.arbitrade?.dexes?.[dexId - 1]?.paths?.length - 1]?.decimals
-        )],
+        args: [
+            dex?.router,
+            [],
+            toWei(
+                dexId === 0 ? arbitrade?.amountIn : (arbitrade?.dexes?.[dexId - 1]?.output || 0),
+                dexId === 0 ? arbitrade?.dexes?.[0]?.paths?.[0]?.decimals :
+                    arbitrade?.dexes?.[dexId - 1]?.paths?.[arbitrade?.dexes?.[dexId - 1]?.paths?.length - 1]?.decimals
+            )],
     }
 
-    dex?.paths?.map((token, index) => {
-        const data = target['args'][1] || []
-        data?.push(token?.address)
-        target['args'][1] = data
-        return target
-    })
+    dex?.paths?.map((token) => (target['args'][1]).push(token?.address))
 
     const { data, error, isLoading, refetch, status, isError } = useContractRead({
         ...target,
         watch: true,
         cacheTime: 0,
         staleTime: 0,
-        enabled: true
+        enabled: Boolean(arbitrade?.amountIn > 0 && target['args'][1]?.length > 1)
     })
+
 
     useEffect(() => {
         if (!data || isError) {
@@ -61,7 +61,7 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
             !isLoading || refetch()
         }
         else
-            handleOutputUpdateForDex(dexId, fmWei(data as any ?? 0, params?.arbitrade?.dexes?.[dexId - 1]?.paths?.[params?.arbitrade?.dexes?.[dexId - 1]?.paths?.length - 1]?.decimals))
+            handleOutputUpdateForDex(dexId, fmWei(data as any ?? 0, arbitrade?.dexes?.[dexId - 1]?.paths?.[arbitrade?.dexes?.[dexId - 1]?.paths?.length - 1]?.decimals))
     }, [data, error, status, isError])
 
 
@@ -84,8 +84,8 @@ export default function ArbitrageRoutePath(props: { dex: IDex, dexId: number }) 
                                     {isLoading ? <CircularProgress size={16} color="warning" />
                                         : (index == 0) &&
                                         precise(
-                                            (dexId === 0) ? params?.arbitrade?.amountIn
-                                                : params?.arbitrade?.dexes?.[dexId - 1]?.output, 4
+                                            (dexId === 0) ? arbitrade?.amountIn
+                                                : arbitrade?.dexes?.[dexId - 1]?.output, 4
                                         )
                                     }
                                     {isLoading ? '' : (index == dex?.paths?.length - 1) && precise(dex?.output, 4)}
